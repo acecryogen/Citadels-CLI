@@ -157,4 +157,38 @@ public class CharacterAbilities {
     private void handleMagicianAction(Player player, String action) {
         System.out.println("Magician action not implemented yet.");
     }
+
+    // Placeholder for AI character ability logic
+    public void handleAbilityAI(Player player, int killedCharacter, int robbedCharacter) {
+        CharacterCard character = player.getCharacter();
+        if (character == null) return;
+
+        // AI doesn't use scanner, makes decisions programmatically
+        System.out.println("Player " + player.getId() + " (" + character.getName() + ") is considering its AI ability logic.");
+        // Basic AI logic placeholders:
+        switch (character.getName()) {
+            case "Assassin":
+                // AI Assassin might pick a random player/character to "kill"
+                // This would typically involve updating game state (e.g. game.setKilledCharacterThisRound(targetRank))
+                System.out.println("AI Assassin: Deciding who to kill (not fully implemented).");
+                break;
+            case "Thief":
+                // AI Thief might pick a random player/character to "rob"
+                System.out.println("AI Thief: Deciding who to rob (not fully implemented).");
+                break;
+            case "Magician":
+                // AI Magician might swap with poorest player or redraw if hand is bad
+                System.out.println("AI Magician: Deciding on magic action (not fully implemented).");
+                break;
+            // King, Bishop, Merchant abilities are passive income, already handled by their specific methods if called during turn.
+            // Architect draws cards, already handled.
+            case "Warlord":
+                // AI Warlord might destroy cheapest district of richest player
+                System.out.println("AI Warlord: Deciding what to destroy (not fully implemented).");
+                break;
+            default:
+                // System.out.println("AI " + character.getName() + ": No specific AI ability action defined here.");
+                break;
+        }
+    }
 }

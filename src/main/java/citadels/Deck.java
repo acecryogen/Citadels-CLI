@@ -24,6 +24,11 @@ public class Deck {
         return cards.size();
     }
 
+    // Added cardsLeft() as an alias for size()
+    public int cardsLeft() {
+        return cards.size();
+    }
+
     public List<DistrictCard> getCards() {
         return cards;
     }

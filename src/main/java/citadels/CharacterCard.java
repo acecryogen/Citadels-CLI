@@ -17,6 +17,11 @@ public class CharacterCard {
         return number;
     }
 
+    // Added getRank() as an alias for getNumber() for compatibility
+    public int getRank() {
+        return number;
+    }
+
     public String getName() {
         return name;
     }
