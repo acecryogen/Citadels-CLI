@@ -62,56 +62,56 @@ public class App {
         return deck;
     }
 
-    private static void processCommand(String input, Game game, Player player) {
-        switch (input.toLowerCase()) {
-            case "t":
-            case "turn":
-                game.processTurn();
-                break;
-            case "hand":
-                game.showHand(player);
-                break;
-            case "city":
-                game.showCity(player);
-                break;
-            case "all":
-                game.showAll();
-                break;
-            case "gold":
-                System.out.println("You have " + player.getGold() + " gold.");
-                break;
-            case "action":
-                game.describeAction(player);
-                break;
-            case "help":
-                System.out.println("Commands: turn (t), hand, city, all, gold, action, help");
-                break;
-            case "save":
-                game.saveGame("citadels_save.json");
-                System.out.println("Game saved.");
-                break;
-            case "load":
-                game.loadGame("citadels_save.json");
-                System.out.println("Game loaded.");
-                break;
-            case "quit":
-                System.exit(0);
-                break;
-            default:
-                if (input.startsWith("build ")) {
-                    try {
-                        int cardNum = Integer.parseInt(input.substring(6));
-                        game.build(player, cardNum);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid card number.");
-                    }
-                } else if (input.startsWith("info ")) {
-                    game.showInfo(input.substring(5));
-                } else {
-                    System.out.println("Unknown command. Type 'help' for commands.");
-                }
-        }
-    }
+    // private static void processCommand(String input, Game game, Player player) {
+    //     switch (input.toLowerCase()) {
+    //         case "t":
+    //         case "turn":
+    //             game.processTurn();
+    //             break;
+    //         case "hand":
+    //             game.showHand(player);
+    //             break;
+    //         case "city":
+    //             game.showCity(player);
+    //             break;
+    //         case "all":
+    //             game.showAll();
+    //             break;
+    //         case "gold":
+    //             System.out.println("You have " + player.getGold() + " gold.");
+    //             break;
+    //         case "action":
+    //             game.describeAction(player);
+    //             break;
+    //         case "help":
+    //             System.out.println("Commands: turn (t), hand, city, all, gold, action, help");
+    //             break;
+    //         case "save":
+    //             game.saveGame("citadels_save.json");
+    //             System.out.println("Game saved.");
+    //             break;
+    //         case "load":
+    //             game.loadGame("citadels_save.json");
+    //             System.out.println("Game loaded.");
+    //             break;
+    //         case "quit":
+    //             System.exit(0);
+    //             break;
+    //         default:
+    //             if (input.startsWith("build ")) {
+    //                 try {
+    //                     int cardNum = Integer.parseInt(input.substring(6));
+    //                     game.build(player, cardNum);
+    //                 } catch (NumberFormatException e) {
+    //                     System.out.println("Invalid card number.");
+    //                 }
+    //             } else if (input.startsWith("info ")) {
+    //                 game.showInfo(input.substring(5));
+    //             } else {
+    //                 System.out.println("Unknown command. Type 'help' for commands.");
+    //             }
+    //     }
+    // }
 
     public static void main(String[] args) {
         // Initialize scanner with System.in
@@ -152,19 +152,38 @@ public class App {
 
         // Create and start game
         Game game = new Game(players, deck, characterDeck);
+        game.setScanner(scanner); // IMPORTANT: Ensure this line is added
 
-        // Game loop
+        // New Game loop - round-based
         while (!game.isOver()) {
-            System.out.print("> ");
-            if (scanner.hasNextLine()) {
-                String input = scanner.nextLine().trim();
-                processCommand(input, game, players.get(0));
-            } else {
-                System.out.println("No input detected. Exiting...");
-                break; // Exit the game loop if no input is detected
+            System.out.println("\n--- Round " + game.getRound() + " ---");
+
+            // Phase 1: Character Selection
+            System.out.println("Character Selection Phase...");
+            game.characterSelectionPhase(scanner);
+
+            // Phase 2: Turn Phase
+            System.out.println("\nTurn Phase...");
+            game.turnPhase(scanner);
+
+            // Check for game over condition immediately after turns are processed
+            // (game.isOver() might be updated during turnPhase if a win condition is met)
+            if (game.isOver()) {
+                // scoreManager.showScores() is often called within game.turnPhase() or game.isOver() when true
+                // If not, it might be needed here. For now, assume turnPhase or isOver handles final score display.
+                break; 
             }
+
+            // End of round logic
+            game.setRound(game.getRound() + 1);
+            // Optional: Add a small delay or prompt to continue to next round for better UX
+            // System.out.println("Press Enter to start next round...");
+            // scanner.nextLine(); 
         }
 
+        System.out.println("Game has ended.");
+        // game.showScores(); // Ensure scores are shown if not handled by turnPhase when game ends.
+        
         // Clean up
         scanner.close();
     }

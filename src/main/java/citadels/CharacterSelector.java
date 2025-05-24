@@ -7,6 +7,8 @@ public class CharacterSelector {
     private List<Player> players;
     private List<CharacterCard> characterDeck;
     private Scanner scanner;
+    private int killedCharacterRank = -1; // Placeholder for actual logic
+    private int robbedCharacterRank = -1; // Placeholder for actual logic
 
     public CharacterSelector(Game game, List<Player> players, List<CharacterCard> characterDeck) {
         this.game = game;
@@ -18,8 +20,23 @@ public class CharacterSelector {
         this.scanner = scanner;
     }
 
+    // Added placeholder getter
+    public int getKilledCharacterRank() {
+        // In a real implementation, this would be determined by Assassin's choice
+        return killedCharacterRank; 
+    }
+    
+    // Added placeholder getter
+    public int getRobbedCharacterRank() {
+        // In a real implementation, this would be determined by Thief's choice
+        return robbedCharacterRank;
+    }
+
     public Map<Integer, Player> selectCharacters(int crownedPlayerIndex) {
         Map<Integer, Player> characterToPlayer = new HashMap<>();
+        // Reset killed/robbed status at the start of selection
+        this.killedCharacterRank = -1;
+        this.robbedCharacterRank = -1;
         List<CharacterCard> availableCharacters = setupAvailableCharacters();
         List<Player> pickOrder = determinePickOrder(crownedPlayerIndex);
 
