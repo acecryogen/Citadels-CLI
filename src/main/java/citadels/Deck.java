@@ -15,11 +15,20 @@ public class Deck {
     }
 
     public DistrictCard draw() {
-        if (cards.isEmpty()) return null;
+        if (cards.isEmpty())
+            return null;
         return cards.remove(0);
     }
 
     public int size() {
         return cards.size();
+    }
+
+    public List<DistrictCard> getCards() {
+        return cards;
+    }
+
+    public void addCard(DistrictCard card) {
+        cards.add(card);
     }
 }

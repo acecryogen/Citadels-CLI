@@ -57,3 +57,7 @@ jar {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
 }
+
+tasks.named('run') {
+    standardInput = System.in
+}

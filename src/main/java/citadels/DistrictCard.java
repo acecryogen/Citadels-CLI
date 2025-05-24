@@ -19,9 +19,4 @@ public class DistrictCard {
         this.cost = cost;
         this.text = text;
     }
-
-    @Override
-    public String toString() {
-        return name + " [" + color + cost + "]";
-    }
 }

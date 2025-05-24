@@ -38,29 +38,15 @@ public class Player {
     }
 
     public void spendGold(int amount) {
-        gold -= amount;
+        this.gold = Math.max(0, this.gold - amount);
     }
 
     public List<DistrictCard> getHand() {
         return hand;
     }
 
-    public void addToHand(DistrictCard card) {
-        hand.add(card);
-    }
-
-    public void removeFromHand(DistrictCard card) {
-        hand.remove(card);
-    }
-
     public List<DistrictCard> getCity() {
         return city;
-    }
-
-    public void buildDistrict(DistrictCard card) {
-        city.add(card);
-        hand.remove(card);
-        spendGold(card.cost);
     }
 
     public CharacterCard getCharacter() {
@@ -77,6 +63,31 @@ public class Player {
 
     public void setCrown(boolean hasCrown) {
         this.hasCrown = hasCrown;
+    }
+
+    public void removeFromHand(DistrictCard card) {
+        hand.remove(card);
+    }
+
+    public void addToHand(DistrictCard card) {
+        if (hand == null) {
+            hand = new ArrayList<>();
+        }
+        hand.add(card);
+    }
+
+    public void buildDistrict(DistrictCard card) {
+        // Check if district already exists in city
+        if (city.stream().anyMatch(d -> d.name.equals(card.name))) {
+            return;
+        }
+
+        // Remove from hand if present
+        hand.remove(card);
+
+        // Add to city and spend gold
+        city.add(card);
+        spendGold(card.cost);
     }
 
     @Override

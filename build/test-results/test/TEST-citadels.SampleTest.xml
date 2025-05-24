@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="citadels.SampleTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2025-05-24T09:01:46.017Z" hostname="Aabhass-MacBook-Air.local" time="0.032">
+  <properties/>
+  <testcase name="testCharacterCardEquality()" classname="citadels.SampleTest" time="0.012"/>
+  <testcase name="testKeepCannotBeDestroyed()" classname="citadels.SampleTest" time="0.001"/>
+  <testcase name="testGold()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testDrawFromEmptyDeck()" classname="citadels.SampleTest" time="0.002"/>
+  <testcase name="testDistrictCard()" classname="citadels.SampleTest" time="0.002"/>
+  <testcase name="testGameLoading()" classname="citadels.SampleTest" time="0.006"/>
+  <testcase name="testGameInitialization()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testCharacterCard()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testDeckShuffleDraw()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testSpendTooMuchGold()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testGraveyardRecovery()" classname="citadels.SampleTest" time="0.001"/>
+  <testcase name="testPlayerInit()" classname="citadels.SampleTest" time="0.001"/>
+  <testcase name="testHandAndCity()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testBuildDistrict()" classname="citadels.SampleTest" time="0.0"/>
+  <testcase name="testObservatoryDraw()" classname="citadels.SampleTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
