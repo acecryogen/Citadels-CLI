@@ -1,6 +1,6 @@
 package citadels;
 
-import java.util.Objects;
+import java.util.*;
 
 public class CharacterCard {
     private final int number; // 1-8 for turn order

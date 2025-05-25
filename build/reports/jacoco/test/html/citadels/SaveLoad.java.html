@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SaveLoad.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">SaveLoad.java</span></div><h1>SaveLoad.java</h1><pre class="source lang-java linenums">package citadels;
+
+import org.json.simple.*;
+import org.json.simple.parser.*;
+import java.io.*;
+import java.util.*;
+
+public class SaveLoad {
+    private Game game;
+    private List&lt;Player&gt; players;
+    private Deck districtDeck;
+    private List&lt;CharacterCard&gt; characterDeck;
+
+<span class="nc" id="L14">    public SaveLoad(Game game, List&lt;Player&gt; players, Deck districtDeck, List&lt;CharacterCard&gt; characterDeck) {</span>
+<span class="nc" id="L15">        this.game = game;</span>
+<span class="nc" id="L16">        this.players = players;</span>
+<span class="nc" id="L17">        this.districtDeck = districtDeck;</span>
+<span class="nc" id="L18">        this.characterDeck = characterDeck;</span>
+<span class="nc" id="L19">    }</span>
+
+    public void saveGame(String filename) {
+<span class="nc" id="L22">        JSONObject obj = createGameState();</span>
+<span class="nc" id="L23">        writeToFile(filename, obj);</span>
+<span class="nc" id="L24">    }</span>
+
+    private JSONObject createGameState() {
+<span class="nc" id="L27">        JSONObject obj = new JSONObject();</span>
+<span class="nc" id="L28">        obj.put(&quot;round&quot;, game.getRound());</span>
+<span class="nc" id="L29">        obj.put(&quot;crownedPlayerIndex&quot;, game.getCrownedPlayerIndex());</span>
+<span class="nc" id="L30">        obj.put(&quot;players&quot;, createPlayersArray());</span>
+<span class="nc" id="L31">        obj.put(&quot;deck&quot;, createDeckArray());</span>
+<span class="nc" id="L32">        return obj;</span>
+    }
+
+    private JSONArray createPlayersArray() {
+<span class="nc" id="L36">        JSONArray playersArr = new JSONArray();</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (Player p : players) {</span>
+<span class="nc" id="L38">            JSONObject pObj = createPlayerObject(p);</span>
+<span class="nc" id="L39">            playersArr.add(pObj);</span>
+<span class="nc" id="L40">        }</span>
+<span class="nc" id="L41">        return playersArr;</span>
+    }
+
+    private JSONObject createPlayerObject(Player p) {
+<span class="nc" id="L45">        JSONObject pObj = new JSONObject();</span>
+<span class="nc" id="L46">        pObj.put(&quot;id&quot;, p.getId());</span>
+<span class="nc" id="L47">        pObj.put(&quot;isHuman&quot;, p.isHuman());</span>
+<span class="nc" id="L48">        pObj.put(&quot;gold&quot;, p.getGold());</span>
+<span class="nc" id="L49">        pObj.put(&quot;hasCrown&quot;, p.hasCrown());</span>
+<span class="nc" id="L50">        pObj.put(&quot;hand&quot;, createCardsArray(p.getHand()));</span>
+<span class="nc" id="L51">        pObj.put(&quot;city&quot;, createCardsArray(p.getCity()));</span>
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (p.getCharacter() != null) {</span>
+<span class="nc" id="L54">            pObj.put(&quot;character&quot;, p.getCharacter().getName());</span>
+        }
+<span class="nc" id="L56">        return pObj;</span>
+    }
+
+    private JSONArray createCardsArray(List&lt;DistrictCard&gt; cards) {
+<span class="nc" id="L60">        JSONArray cardArr = new JSONArray();</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        for (DistrictCard c : cards) {</span>
+<span class="nc" id="L62">            cardArr.add(createCardObject(c));</span>
+<span class="nc" id="L63">        }</span>
+<span class="nc" id="L64">        return cardArr;</span>
+    }
+
+    private JSONObject createCardObject(DistrictCard c) {
+<span class="nc" id="L68">        JSONObject cObj = new JSONObject();</span>
+<span class="nc" id="L69">        cObj.put(&quot;name&quot;, c.name);</span>
+<span class="nc" id="L70">        cObj.put(&quot;color&quot;, c.color);</span>
+<span class="nc" id="L71">        cObj.put(&quot;cost&quot;, c.cost);</span>
+<span class="nc" id="L72">        cObj.put(&quot;text&quot;, c.text);</span>
+<span class="nc" id="L73">        return cObj;</span>
+    }
+
+    private void writeToFile(String filename, JSONObject obj) {
+<span class="nc" id="L77">        try (FileWriter file = new FileWriter(filename)) {</span>
+<span class="nc" id="L78">            file.write(obj.toJSONString());</span>
+<span class="nc" id="L79">            System.out.println(&quot;Game saved to &quot; + filename);</span>
+<span class="nc" id="L80">        } catch (Exception e) {</span>
+<span class="nc" id="L81">            System.out.println(&quot;Failed to save game: &quot; + e.getMessage());</span>
+<span class="nc" id="L82">        }</span>
+<span class="nc" id="L83">    }</span>
+
+    public void loadGame(String filename) {
+        try {
+<span class="nc" id="L87">            JSONObject obj = readFromFile(filename);</span>
+<span class="nc" id="L88">            restoreGameState(obj);</span>
+<span class="nc" id="L89">            System.out.println(&quot;Game loaded from &quot; + filename);</span>
+<span class="nc" id="L90">        } catch (Exception e) {</span>
+<span class="nc" id="L91">            System.out.println(&quot;Failed to load game: &quot; + e.getMessage());</span>
+<span class="nc" id="L92">        }</span>
+<span class="nc" id="L93">    }</span>
+
+    private JSONObject readFromFile(String filename) throws Exception {
+<span class="nc" id="L96">        JSONParser parser = new JSONParser();</span>
+<span class="nc" id="L97">        try (FileReader reader = new FileReader(filename)) {</span>
+<span class="nc" id="L98">            return (JSONObject) parser.parse(reader);</span>
+        }
+    }
+
+    private void restoreGameState(JSONObject obj) {
+        // Restore basic game state
+<span class="nc" id="L104">        game.setRound(((Long) obj.get(&quot;round&quot;)).intValue());</span>
+<span class="nc" id="L105">        game.setCrownedPlayerIndex(((Long) obj.get(&quot;crownedPlayerIndex&quot;)).intValue());</span>
+
+        // Restore players
+<span class="nc" id="L108">        JSONArray playersArr = (JSONArray) obj.get(&quot;players&quot;);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        for (int i = 0; i &lt; playersArr.size(); i++) {</span>
+<span class="nc" id="L110">            JSONObject pObj = (JSONObject) playersArr.get(i);</span>
+<span class="nc" id="L111">            restorePlayer(players.get(i), pObj);</span>
+        }
+
+        // Restore deck
+<span class="nc" id="L115">        JSONArray deckArr = (JSONArray) obj.get(&quot;deck&quot;);</span>
+<span class="nc" id="L116">        restoreDeck(deckArr);</span>
+<span class="nc" id="L117">    }</span>
+
+    private void restorePlayer(Player p, JSONObject pObj) {
+        // Clear existing state
+<span class="nc" id="L121">        p.getHand().clear();</span>
+<span class="nc" id="L122">        p.getCity().clear();</span>
+
+        // Restore basic properties
+<span class="nc" id="L125">        p.setCrown(((Boolean) pObj.get(&quot;hasCrown&quot;)).booleanValue());</span>
+<span class="nc" id="L126">        p.addGold(((Long) pObj.get(&quot;gold&quot;)).intValue());</span>
+
+        // Restore hand
+<span class="nc" id="L129">        JSONArray handArr = (JSONArray) pObj.get(&quot;hand&quot;);</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        for (Object cardObj : handArr) {</span>
+<span class="nc" id="L131">            p.addToHand(createDistrictCard((JSONObject) cardObj));</span>
+<span class="nc" id="L132">        }</span>
+
+        // Restore city
+<span class="nc" id="L135">        JSONArray cityArr = (JSONArray) pObj.get(&quot;city&quot;);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        for (Object cardObj : cityArr) {</span>
+<span class="nc" id="L137">            p.buildDistrict(createDistrictCard((JSONObject) cardObj));</span>
+<span class="nc" id="L138">        }</span>
+
+        // Restore character if present
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (pObj.containsKey(&quot;character&quot;)) {</span>
+<span class="nc" id="L142">            String charName = (String) pObj.get(&quot;character&quot;);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">            for (CharacterCard cc : characterDeck) {</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">                if (cc.getName().equals(charName)) {</span>
+<span class="nc" id="L145">                    p.setCharacter(cc);</span>
+<span class="nc" id="L146">                    break;</span>
+                }
+<span class="nc" id="L148">            }</span>
+        }
+<span class="nc" id="L150">    }</span>
+
+    private DistrictCard createDistrictCard(JSONObject cardObj) {
+<span class="nc" id="L153">        return new DistrictCard(</span>
+<span class="nc" id="L154">                (String) cardObj.get(&quot;name&quot;),</span>
+<span class="nc" id="L155">                (String) cardObj.get(&quot;color&quot;),</span>
+<span class="nc" id="L156">                ((Long) cardObj.get(&quot;cost&quot;)).intValue(),</span>
+<span class="nc" id="L157">                (String) cardObj.get(&quot;text&quot;));</span>
+    }
+
+    private void restoreDeck(JSONArray deckArr) {
+        // Clear existing deck
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        while (districtDeck.size() &gt; 0) {</span>
+<span class="nc" id="L163">            districtDeck.draw();</span>
+        }
+
+        // Restore cards to deck
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        for (Object cardObj : deckArr) {</span>
+<span class="nc" id="L168">            districtDeck.addCard(createDistrictCard((JSONObject) cardObj));</span>
+<span class="nc" id="L169">        }</span>
+<span class="nc" id="L170">    }</span>
+
+    private JSONArray createDeckArray() {
+<span class="nc" id="L173">        JSONArray deckArr = new JSONArray();</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        for (DistrictCard card : districtDeck.getCards()) {</span>
+<span class="nc" id="L175">            deckArr.add(createCardObject(card));</span>
+<span class="nc" id="L176">        }</span>
+<span class="nc" id="L177">        return deckArr;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

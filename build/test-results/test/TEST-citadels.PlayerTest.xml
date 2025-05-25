@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="citadels.PlayerTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2025-05-25T03:41:17.066Z" hostname="DESKTOP-6SOTHRK" time="0.011">
+  <properties/>
+  <testcase name="testSpendGoldMoreThanAvailable()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testPlayerNameSetterGetter()" classname="citadels.PlayerTest" time="0.0"/>
+  <testcase name="testBuildDistrictNotAffordable()" classname="citadels.PlayerTest" time="0.0"/>
+  <testcase name="testSpendGoldExactAmount()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testPlayerInitialName()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testBuildDistrictAlreadyInCity()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testBuildDistrictAffordableAndNotInCity()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testAddGoldAndGetGold()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="addToHand_NullCard_ShouldNotAdd()" classname="citadels.PlayerTest" time="0.001"/>
+  <testcase name="testSpendGoldSufficient()" classname="citadels.PlayerTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

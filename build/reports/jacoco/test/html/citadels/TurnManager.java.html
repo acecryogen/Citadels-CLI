@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TurnManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">TurnManager.java</span></div><h1>TurnManager.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.util.*;
+
+public class TurnManager {
+    private Game game;
+    private List&lt;Player&gt; players;
+    private Deck districtDeck;
+    private Map&lt;Integer, Player&gt; characterToPlayer;
+    private Scanner scanner;
+
+<span class="nc" id="L12">    public TurnManager(Game game, List&lt;Player&gt; players, Deck districtDeck, Map&lt;Integer, Player&gt; characterToPlayer) {</span>
+<span class="nc" id="L13">        this.game = game;</span>
+<span class="nc" id="L14">        this.players = players;</span>
+<span class="nc" id="L15">        this.districtDeck = districtDeck;</span>
+<span class="nc" id="L16">        this.characterToPlayer = characterToPlayer; // This map is passed in, potentially null initially</span>
+<span class="nc" id="L17">    }</span>
+
+    public void setScanner(Scanner scanner) {
+<span class="nc" id="L20">        this.scanner = scanner;</span>
+<span class="nc" id="L21">    }</span>
+
+    public void handlePlayerTurn(Player player, int killedCharacter, int robbedCharacter) {
+<span class="nc bnc" id="L24" title="All 2 branches missed.">        if (player.isHuman()) {</span>
+<span class="nc" id="L25">            handleHumanTurn(player);</span>
+        } else {
+<span class="nc" id="L27">            handleAITurn(player);</span>
+        }
+<span class="nc" id="L29">    }</span>
+
+    private void handleHumanTurn(Player player) {
+<span class="nc" id="L32">        System.out.println(&quot;\nIt's your turn, Player &quot; + player.getId() +</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                           (player.getCharacter() != null ? &quot; (&quot; + player.getCharacter().getName() + &quot;)&quot; : &quot;&quot;) + &quot;.&quot;);</span>
+        
+<span class="nc" id="L35">        boolean turnOver = false;</span>
+<span class="nc" id="L36">        boolean hasTakenMainAction = false; // True if player took gold or drew cards</span>
+<span class="nc" id="L37">        int buildsDoneThisTurn = 0; // Actual successful builds</span>
+<span class="nc" id="L38">        int maxBuilds = 1; // Default</span>
+<span class="nc bnc" id="L39" title="All 4 branches missed.">        if (player.getCharacter() != null &amp;&amp; &quot;Architect&quot;.equals(player.getCharacter().getName())) {</span>
+<span class="nc" id="L40">            maxBuilds = 3;</span>
+        }
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        while (!turnOver) {</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            System.out.print((player.getCharacter() != null ? player.getCharacter().getName() : &quot;Player &quot; + player.getId()) + &quot; &gt; &quot;);</span>
+<span class="nc" id="L45">            String input = &quot;&quot;;</span>
+<span class="nc bnc" id="L46" title="All 4 branches missed.">            if (scanner != null &amp;&amp; scanner.hasNextLine()) {</span>
+<span class="nc" id="L47">                input = scanner.nextLine().trim();</span>
+            } else { 
+<span class="nc" id="L49">                System.out.println(&quot;No input detected or scanner closed. Ending turn by default.&quot;);</span>
+<span class="nc" id="L50">                turnOver = true; </span>
+<span class="nc" id="L51">                continue;</span>
+            }
+
+<span class="nc bnc" id="L54" title="All 4 branches missed.">            if (input.equalsIgnoreCase(&quot;end&quot;) || input.equalsIgnoreCase(&quot;done&quot;)) {</span>
+<span class="nc" id="L55">                System.out.println(&quot;Ending your turn.&quot;);</span>
+<span class="nc" id="L56">                turnOver = true;</span>
+<span class="nc" id="L57">                continue;</span>
+            }
+
+<span class="nc bnc" id="L60" title="All 9 branches missed.">            switch (input.toLowerCase()) {</span>
+                case &quot;gold&quot;:
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                    if (!hasTakenMainAction) {</span>
+<span class="nc" id="L63">                        player.addGold(2);</span>
+<span class="nc" id="L64">                        System.out.println(&quot;You took 2 gold. You now have &quot; + player.getGold() + &quot; gold.&quot;);</span>
+<span class="nc" id="L65">                        hasTakenMainAction = true;</span>
+                    } else {
+<span class="nc" id="L67">                        System.out.println(&quot;You have already taken your main action (gold or cards).&quot;);</span>
+                    }
+<span class="nc" id="L69">                    break;</span>
+                case &quot;draw&quot;:
+<span class="nc bnc" id="L71" title="All 2 branches missed.">                    if (!hasTakenMainAction) {</span>
+<span class="nc" id="L72">                        DistrictCard drawnCard1 = districtDeck.draw();</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">                        if (drawnCard1 != null) {</span>
+<span class="nc" id="L74">                            player.addToHand(drawnCard1);</span>
+<span class="nc" id="L75">                            System.out.println(&quot;You drew a card: &quot; + drawnCard1.name + &quot; (&quot; + drawnCard1.cost + &quot; gold, &quot; + drawnCard1.color + &quot;).&quot;);</span>
+<span class="nc" id="L76">                            hasTakenMainAction = true;</span>
+                        } else {
+<span class="nc" id="L78">                            System.out.println(&quot;District deck is empty.&quot;);</span>
+                        }
+<span class="nc" id="L80">                    } else {</span>
+<span class="nc" id="L81">                        System.out.println(&quot;You have already taken your main action (gold or cards).&quot;);</span>
+                    }
+<span class="nc" id="L83">                    break;</span>
+                case &quot;build&quot;: 
+<span class="nc" id="L85">                    System.out.println(&quot;To build, type 'build &lt;number_from_hand&gt;'. Type 'hand' to see your cards and their numbers.&quot;);</span>
+<span class="nc" id="L86">                    break;</span>
+                case &quot;action&quot;:
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                    System.out.println(&quot;Attempting to use character ability (&quot; + (player.getCharacter() != null ? player.getCharacter().getName() : &quot;No character&quot;) + &quot;)...&quot;);</span>
+<span class="nc bnc" id="L89" title="All 4 branches missed.">                    if (player.getCharacter() != null &amp;&amp; game.getCharacterAbilities() != null) { // Assuming getCharacterAbilities exists</span>
+<span class="nc" id="L90">                        game.getCharacterAbilities().handleAbility(player, game.getKilledCharacterThisRound(), game.getRobbedCharacterThisRound());</span>
+                        // System.out.println(player.getCharacter().getName() + &quot;'s ability was attempted.&quot;);
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                    } else if (player.getCharacter() == null) {</span>
+<span class="nc" id="L93">                        System.out.println(&quot;You do not have a character to use an ability.&quot;);</span>
+                    } else {
+<span class="nc" id="L95">                         System.out.println(&quot;CharacterAbilities not available in Game object.&quot;);</span>
+                    }
+<span class="nc" id="L97">                    break;</span>
+                case &quot;hand&quot;:
+<span class="nc" id="L99">                    game.showHand(player);</span>
+<span class="nc" id="L100">                    break;</span>
+                case &quot;city&quot;:
+<span class="nc" id="L102">                    game.showCity(player);</span>
+<span class="nc" id="L103">                    break;</span>
+                case &quot;mygold&quot;:
+<span class="nc" id="L105">                    System.out.println(&quot;You have &quot; + player.getGold() + &quot; gold.&quot;);</span>
+<span class="nc" id="L106">                    break;</span>
+                case &quot;help&quot;:
+<span class="nc" id="L108">                    System.out.println(&quot;Available commands: gold, draw, build &lt;num&gt;, action, hand, city, mygold, end/done.&quot;);</span>
+<span class="nc" id="L109">                    System.out.println(&quot;Special commands for Architect: can build up to 3 districts.&quot;);</span>
+<span class="nc" id="L110">                    break;</span>
+                default:
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                    if (input.startsWith(&quot;build &quot;)) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">                        if (!hasTakenMainAction) {</span>
+<span class="nc" id="L114">                            System.out.println(&quot;You must take your main action (gold or draw) before building.&quot;);</span>
+<span class="nc" id="L115">                            break;</span>
+                        }
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                        if (buildsDoneThisTurn &lt; maxBuilds) {</span>
+                            try {
+<span class="nc" id="L119">                                int cardNum = Integer.parseInt(input.substring(6).trim());</span>
+<span class="nc" id="L120">                                int citySizeBefore = player.getCity().size();</span>
+<span class="nc" id="L121">                                game.build(player, cardNum); // game.build is void</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                                if (player.getCity().size() &gt; citySizeBefore) {</span>
+<span class="nc" id="L123">                                    buildsDoneThisTurn++;</span>
+<span class="nc" id="L124">                                    System.out.println(&quot;District built. Builds done this turn: &quot; + buildsDoneThisTurn + &quot;/&quot; + maxBuilds);</span>
+                                } else {
+                                    // Build failed, message should come from game.build()
+<span class="nc" id="L127">                                    System.out.println(&quot;Build may have failed or card was not buildable. Check messages above.&quot;);</span>
+                                }
+<span class="nc" id="L129">                            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L130">                                System.out.println(&quot;Invalid card number. Use 'build &lt;number_from_hand&gt;'.&quot;);</span>
+<span class="nc" id="L131">                            } catch (IndexOutOfBoundsException e) {</span>
+<span class="nc" id="L132">                                System.out.println(&quot;Invalid card number. Type 'hand' to see your cards and their numbers.&quot;);</span>
+<span class="nc" id="L133">                            }</span>
+                        } else {
+<span class="nc" id="L135">                            System.out.println(&quot;You have already built your maximum of &quot; + maxBuilds + &quot; district(s) this turn.&quot;);</span>
+                        }
+                    } else {
+<span class="nc" id="L138">                        System.out.println(&quot;Unknown command. Type 'help' for options.&quot;);</span>
+                    }
+                    break;
+            }
+<span class="nc" id="L142">        }</span>
+<span class="nc" id="L143">    }</span>
+
+    private void handleAITurn(Player player) {
+<span class="nc" id="L146">        System.out.println(&quot;Player &quot; + player.getId() + </span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                           (player.getCharacter() != null ? &quot; (&quot; + player.getCharacter().getName() + &quot;)&quot; : &quot;&quot;) + </span>
+                           &quot; is an AI and is taking its turn.&quot;);
+
+<span class="nc bnc" id="L150" title="All 6 branches missed.">        if (player.getGold() &lt; 3 || player.getHand().size() &lt; 2 &amp;&amp; districtDeck.cardsLeft() &gt; 0) { // AI prefers gold if poor or hand is small (and can draw)</span>
+<span class="nc" id="L151">            player.addGold(2);</span>
+<span class="nc" id="L152">            System.out.println(&quot;Player &quot; + player.getId() + &quot; took 2 gold.&quot;);</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        } else if (districtDeck.cardsLeft() &gt; 0) {</span>
+<span class="nc" id="L154">            DistrictCard drawn = districtDeck.draw();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (drawn != null) { // Should always be true if cardsLeft &gt; 0</span>
+<span class="nc" id="L156">                player.addToHand(drawn);</span>
+<span class="nc" id="L157">                System.out.println(&quot;Player &quot; + player.getId() + &quot; drew: &quot; + drawn.name);</span>
+            }
+<span class="nc" id="L159">        } else { // No cards to draw, take gold</span>
+<span class="nc" id="L160">             player.addGold(2);</span>
+<span class="nc" id="L161">             System.out.println(&quot;Player &quot; + player.getId() + &quot; took 2 gold as deck is empty.&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L164" title="All 4 branches missed.">        int maxBuildsAI = (player.getCharacter() != null &amp;&amp; &quot;Architect&quot;.equals(player.getCharacter().getName())) ? 3 : 1;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        for (int i = 0; i &lt; maxBuildsAI; i++) {</span>
+<span class="nc" id="L166">            DistrictCard toBuild = null;</span>
+<span class="nc" id="L167">            int cardIndexToBuild = -1; </span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            for (int j = 0; j &lt; player.getHand().size(); j++) {</span>
+<span class="nc" id="L169">                DistrictCard card = player.getHand().get(j);</span>
+<span class="nc bnc" id="L170" title="All 4 branches missed.">                if (player.getGold() &gt;= card.cost &amp;&amp; !hasDistrict(player, card.name)) { </span>
+<span class="nc bnc" id="L171" title="All 4 branches missed.">                    if (toBuild == null || card.cost &lt; toBuild.cost) {</span>
+<span class="nc" id="L172">                        toBuild = card;</span>
+<span class="nc" id="L173">                        cardIndexToBuild = j + 1; </span>
+                    }
+                }
+            }
+
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (toBuild != null) {</span>
+<span class="nc" id="L179">                int citySizeBefore = player.getCity().size();</span>
+<span class="nc" id="L180">                game.build(player, cardIndexToBuild);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                if(player.getCity().size() &gt; citySizeBefore) {</span>
+<span class="nc" id="L182">                     System.out.println(&quot;Player &quot; + player.getId() + &quot; built &quot; + toBuild.name + &quot;.&quot;);</span>
+                } else {
+                    break; 
+                }
+            } else {
+                break;
+            }
+        }
+        
+<span class="nc bnc" id="L191" title="All 4 branches missed.">        if (player.getCharacter() != null &amp;&amp; game.getCharacterAbilities() != null) {</span>
+<span class="nc" id="L192">             System.out.println(&quot;Player &quot; + player.getId() + &quot; (&quot; + player.getCharacter().getName() + &quot;) considers using ability.&quot;);</span>
+<span class="nc" id="L193">             game.getCharacterAbilities().handleAbilityAI(player, game.getKilledCharacterThisRound(), game.getRobbedCharacterThisRound());</span>
+        }
+
+<span class="nc" id="L196">        System.out.println(&quot;Player &quot; + player.getId() + &quot; finished their turn.&quot;);</span>
+<span class="nc" id="L197">    }</span>
+
+    public void processTurns() {
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if (characterToPlayer == null) {</span>
+<span class="nc" id="L201">            System.out.println(&quot;Error: Character to Player map not initialized in TurnManager. Skipping turn processing.&quot;);</span>
+<span class="nc" id="L202">            return;</span>
+        }
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        for (int rank = 1; rank &lt;= 8; rank++) {</span>
+<span class="nc" id="L205">            Player currentPlayer = characterToPlayer.get(rank);</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (currentPlayer == null) { </span>
+<span class="nc" id="L208">                CharacterCard c = game.getCharacterByRank(rank); </span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                String characterName = (c != null) ? c.getName() : &quot;Character Rank &quot; + rank;</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">                if (game.getKilledCharacterThisRound() == rank) {</span>
+<span class="nc" id="L211">                     System.out.println(characterName + &quot; was killed and cannot take a turn.&quot;);</span>
+                }
+                continue;
+            }
+            
+<span class="nc bnc" id="L216" title="All 2 branches missed.">            if (currentPlayer.getCharacter() == null) { // Should not happen if currentPlayer is not null</span>
+<span class="nc" id="L217">                 System.out.println(&quot;Error: Player &quot; + currentPlayer.getId() + &quot; has no character assigned. Skipping turn.&quot;);</span>
+<span class="nc" id="L218">                 continue;</span>
+            }
+
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (game.getKilledCharacterThisRound() == currentPlayer.getCharacter().getRank()) {</span>
+<span class="nc" id="L222">                System.out.println(currentPlayer.getCharacter().getName() + &quot; (Player &quot; + currentPlayer.getId() + &quot;) was killed and skips their turn.&quot;);</span>
+<span class="nc" id="L223">                continue;</span>
+            }
+
+            // System.out.println(&quot;\nNow taking turn: &quot; + currentPlayer.getCharacter().getName() +
+            //                    &quot; (Player &quot; + currentPlayer.getId() + (currentPlayer.isHuman() ? &quot;, Human&quot; : &quot;, AI&quot;) + &quot;)&quot;);
+<span class="nc" id="L228">            handlePlayerTurn(currentPlayer, game.getKilledCharacterThisRound(), game.getRobbedCharacterThisRound());</span>
+            
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            if (game.checkGameOverCondition()) { </span>
+<span class="nc" id="L231">                game.setOver(true); </span>
+<span class="nc" id="L232">                System.out.println(&quot;Game over condition met after Player &quot; + currentPlayer.getId() + &quot;'s turn.&quot;);</span>
+<span class="nc" id="L233">                break; </span>
+            }
+        }
+<span class="nc" id="L236">    }</span>
+
+    /*
+    private void processTurnCommand(String input, Player player, int buildsThisTurn, int maxBuilds) {
+        // This method is now commented out as its logic is integrated into handleHumanTurn
+        // switch (input) {
+        //     case &quot;gold&quot;:
+        //         player.addGold(2);
+        //         System.out.println(&quot;You gained 2 gold.&quot;);
+        //         break;
+        //     case &quot;draw&quot;:
+        //         player.addToHand(districtDeck.draw());
+        //         player.addToHand(districtDeck.draw());
+        //         System.out.println(&quot;You drew 2 cards.&quot;);
+        //         break;
+        //     case &quot;build&quot;:
+        //         if (buildsThisTurn &gt;= maxBuilds) {
+        //             System.out.println(&quot;You cannot build more districts this turn.&quot;);
+        //             break;
+        //         }
+        //         System.out.print(&quot;Choose a card to build (number): &quot;);
+        //         try {
+        //             int choice = Integer.parseInt(scanner.nextLine());
+        //             game.build(player, choice);
+        //             buildsThisTurn++;
+        //         } catch (NumberFormatException e) {
+        //             System.out.println(&quot;Invalid input.&quot;);
+        //         }
+        //         break;
+        //     case &quot;end&quot;:
+        //         System.out.println(&quot;Ending your turn.&quot;);
+        //         return; // This was problematic as it didn't set a flag for the loop in handleHumanTurn
+        //     default:
+        //         System.out.println(&quot;Unknown command.&quot;);
+        // }
+    }
+    */
+
+    private boolean hasDistrict(Player player, String districtName) {
+<span class="nc" id="L275">        return player.getCity().stream().anyMatch(d -&gt; d.name.equals(districtName));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -23,9 +23,9 @@ public class CharacterSelector {
     // Added placeholder getter
     public int getKilledCharacterRank() {
         // In a real implementation, this would be determined by Assassin's choice
-        return killedCharacterRank; 
+        return killedCharacterRank;
     }
-    
+
     // Added placeholder getter
     public int getRobbedCharacterRank() {
         // In a real implementation, this would be determined by Thief's choice
@@ -78,7 +78,7 @@ public class CharacterSelector {
         }
     }
 
-    private List<Player> determinePickOrder(int crownedPlayerIndex) {
+    public List<Player> determinePickOrder(int crownedPlayerIndex) {
         List<Player> pickOrder = new ArrayList<>();
 
         // Add players starting from the crowned player

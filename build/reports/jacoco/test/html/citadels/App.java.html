@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+public class App {
+
+    private File cardsFile;
+
+<span class="nc" id="L20">    public App() {</span>
+        try {
+<span class="nc" id="L22">            cardsFile = new File(URLDecoder.decode(this.getClass().getResource(&quot;cards.tsv&quot;).getPath(),</span>
+<span class="nc" id="L23">                    StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L24">        } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L25">            throw new RuntimeException(e);</span>
+<span class="nc" id="L26">        }</span>
+<span class="nc" id="L27">    }</span>
+
+    public List&lt;DistrictCard&gt; loadDistrictCards() {
+<span class="nc" id="L30">        List&lt;DistrictCard&gt; cards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L31">        try (   InputStream input = App.class.getResourceAsStream(&quot;/citadels/cards.tsv&quot;);</span>
+<span class="nc" id="L32">                BufferedReader br = new BufferedReader(new InputStreamReader(input));   ) {</span>
+<span class="nc" id="L33">            String line = br.readLine(); // skip header</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L35">                String[] parts = line.split(&quot;\t&quot;);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                if (parts.length &lt; 4)</span>
+<span class="nc" id="L37">                    continue;</span>
+<span class="nc" id="L38">                String name = parts[0];</span>
+<span class="nc" id="L39">                int qty = Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L40">                String color = parts[2];</span>
+<span class="nc" id="L41">                int cost = Integer.parseInt(parts[3]);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">                String text = parts.length &gt; 4 ? parts[4] : &quot;&quot;;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                for (int i = 0; i &lt; qty; i++) {</span>
+<span class="nc" id="L44">                    cards.add(new DistrictCard(name, color, cost, text));</span>
+                }
+<span class="nc" id="L46">            }</span>
+<span class="nc" id="L47">        } catch (IOException e) {</span>
+<span class="nc" id="L48">            e.printStackTrace();</span>
+<span class="nc" id="L49">        }</span>
+<span class="nc" id="L50">        return cards;</span>
+    }
+
+    private static Deck initializeDistrictDeck() {
+<span class="nc" id="L54">        App app = new App();</span>
+<span class="nc" id="L55">        List&lt;DistrictCard&gt; cards = app.loadDistrictCards();</span>
+<span class="nc" id="L56">        Collections.shuffle(cards);</span>
+<span class="nc" id="L57">        return new Deck(cards);</span>
+    }
+
+    private static List&lt;CharacterCard&gt; initializeCharacterDeck() {
+<span class="nc" id="L61">        List&lt;CharacterCard&gt; deck = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L62">        deck.add(new CharacterCard(1, &quot;Assassin&quot;, &quot;Kill a character&quot;));</span>
+<span class="nc" id="L63">        deck.add(new CharacterCard(2, &quot;Thief&quot;, &quot;Steal gold from another character&quot;));</span>
+<span class="nc" id="L64">        deck.add(new CharacterCard(3, &quot;Magician&quot;, &quot;Exchange hands or cards with another player&quot;));</span>
+<span class="nc" id="L65">        deck.add(new CharacterCard(4, &quot;King&quot;, &quot;Take crown, gain gold from noble (yellow) districts&quot;));</span>
+<span class="nc" id="L66">        deck.add(new CharacterCard(5, &quot;Bishop&quot;, &quot;Protected from Warlord, gain gold from religious (blue) districts&quot;));</span>
+<span class="nc" id="L67">        deck.add(new CharacterCard(6, &quot;Merchant&quot;, &quot;Get 1 extra gold, gain gold from trade (green) districts&quot;));</span>
+<span class="nc" id="L68">        deck.add(new CharacterCard(7, &quot;Architect&quot;, &quot;Draw 2 extra cards, can build up to 3 districts&quot;));</span>
+<span class="nc" id="L69">        deck.add(new CharacterCard(8, &quot;Warlord&quot;, &quot;Destroy a district, gain gold from military (red) districts&quot;));</span>
+<span class="nc" id="L70">        Collections.shuffle(deck);</span>
+<span class="nc" id="L71">        return deck;</span>
+    }
+
+    // private static void processCommand(String input, Game game, Player player) {
+    //     switch (input.toLowerCase()) {
+    //         case &quot;t&quot;:
+    //         case &quot;turn&quot;:
+    //             game.processTurn();
+    //             break;
+    //         case &quot;hand&quot;:
+    //             game.showHand(player);
+    //             break;
+    //         case &quot;city&quot;:
+    //             game.showCity(player);
+    //             break;
+    //         case &quot;all&quot;:
+    //             game.showAll();
+    //             break;
+    //         case &quot;gold&quot;:
+    //             System.out.println(&quot;You have &quot; + player.getGold() + &quot; gold.&quot;);
+    //             break;
+    //         case &quot;action&quot;:
+    //             game.describeAction(player);
+    //             break;
+    //         case &quot;help&quot;:
+    //             System.out.println(&quot;Commands: turn (t), hand, city, all, gold, action, help&quot;);
+    //             break;
+    //         case &quot;save&quot;:
+    //             game.saveGame(&quot;citadels_save.json&quot;);
+    //             System.out.println(&quot;Game saved.&quot;);
+    //             break;
+    //         case &quot;load&quot;:
+    //             game.loadGame(&quot;citadels_save.json&quot;);
+    //             System.out.println(&quot;Game loaded.&quot;);
+    //             break;
+    //         case &quot;quit&quot;:
+    //             System.exit(0);
+    //             break;
+    //         default:
+    //             if (input.startsWith(&quot;build &quot;)) {
+    //                 try {
+    //                     int cardNum = Integer.parseInt(input.substring(6));
+    //                     game.build(player, cardNum);
+    //                 } catch (NumberFormatException e) {
+    //                     System.out.println(&quot;Invalid card number.&quot;);
+    //                 }
+    //             } else if (input.startsWith(&quot;info &quot;)) {
+    //                 game.showInfo(input.substring(5));
+    //             } else {
+    //                 System.out.println(&quot;Unknown command. Type 'help' for commands.&quot;);
+    //             }
+    //     }
+    // }
+
+    public static void main(String[] args) {
+        // Initialize scanner with System.in
+<span class="nc" id="L127">        Scanner scanner = new Scanner(System.in);</span>
+
+        // Get number of players with proper error handling
+<span class="nc" id="L130">        int numPlayers = 0;</span>
+        while (true) {
+<span class="nc" id="L132">            System.out.print(&quot;Enter how many players [4-7]: &quot;);</span>
+            try {
+<span class="nc bnc" id="L134" title="All 2 branches missed.">                if (scanner.hasNextLine()) {</span>
+<span class="nc" id="L135">                    String input = scanner.nextLine().trim();</span>
+<span class="nc" id="L136">                    numPlayers = Integer.parseInt(input);</span>
+<span class="nc bnc" id="L137" title="All 4 branches missed.">                    if (numPlayers &gt;= 4 &amp;&amp; numPlayers &lt;= 7) {</span>
+<span class="nc" id="L138">                        break; // Exit the loop when valid input is provided</span>
+                    } else {
+<span class="nc" id="L140">                        System.out.println(&quot;Please enter a number between 4 and 7.&quot;);</span>
+                    }
+<span class="nc" id="L142">                } else {</span>
+<span class="nc" id="L143">                    System.out.println(&quot;No input detected. Exiting...&quot;);</span>
+<span class="nc" id="L144">                    return; // Exit the program if no input is detected</span>
+                }
+<span class="nc" id="L146">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L147">                System.out.println(&quot;Invalid input. Please enter a number.&quot;);</span>
+<span class="nc" id="L148">            }</span>
+        }
+
+        // Initialize game components
+<span class="nc" id="L152">        List&lt;Player&gt; players = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L153">        players.add(new Player(1, true)); // Human player</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        for (int i = 2; i &lt;= numPlayers; i++) {</span>
+<span class="nc" id="L155">            players.add(new Player(i, false)); // AI players</span>
+        }
+
+        // Create district and character decks
+<span class="nc" id="L159">        Deck deck = initializeDistrictDeck();</span>
+<span class="nc" id="L160">        List&lt;CharacterCard&gt; characterDeck = initializeCharacterDeck();</span>
+
+        // Create and start game
+<span class="nc" id="L163">        Game game = new Game(players, deck, characterDeck);</span>
+<span class="nc" id="L164">        game.setScanner(scanner); // IMPORTANT: Ensure this line is added</span>
+
+        // New Game loop - round-based
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        while (!game.isOver()) {</span>
+<span class="nc" id="L168">            System.out.println(&quot;\n--- Round &quot; + game.getRound() + &quot; ---&quot;);</span>
+
+            // Phase 1: Character Selection
+<span class="nc" id="L171">            System.out.println(&quot;Character Selection Phase...&quot;);</span>
+<span class="nc" id="L172">            game.characterSelectionPhase(scanner);</span>
+
+            // Phase 2: Turn Phase
+<span class="nc" id="L175">            System.out.println(&quot;\nTurn Phase...&quot;);</span>
+<span class="nc" id="L176">            game.turnPhase(scanner);</span>
+
+            // Check for game over condition immediately after turns are processed
+            // (game.isOver() might be updated during turnPhase if a win condition is met)
+<span class="nc bnc" id="L180" title="All 2 branches missed.">            if (game.isOver()) {</span>
+                // scoreManager.showScores() is often called within game.turnPhase() or game.isOver() when true
+                // If not, it might be needed here. For now, assume turnPhase or isOver handles final score display.
+<span class="nc" id="L183">                break; </span>
+            }
+
+            // End of round logic
+<span class="nc" id="L187">            game.setRound(game.getRound() + 1);</span>
+            // Optional: Add a small delay or prompt to continue to next round for better UX
+            // System.out.println(&quot;Press Enter to start next round...&quot;);
+            // scanner.nextLine(); 
+        }
+
+<span class="nc" id="L193">        System.out.println(&quot;Game has ended.&quot;);</span>
+        // game.showScores(); // Ensure scores are shown if not handled by turnPhase when game ends.
+        
+        // Clean up
+<span class="nc" id="L197">        scanner.close();</span>
+<span class="nc" id="L198">    }</span>
+
+    // ... rest of the class implementation
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

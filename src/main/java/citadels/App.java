@@ -1,8 +1,8 @@
 package citadels;
 
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.io.*;
 import java.util.*;
 
 public class App {
@@ -20,7 +20,8 @@ public class App {
 
     public List<DistrictCard> loadDistrictCards() {
         List<DistrictCard> cards = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(cardsFile))) {
+        try (InputStream input = App.class.getResourceAsStream("/citadels/cards.tsv");
+                BufferedReader br = new BufferedReader(new InputStreamReader(input));) {
             String line = br.readLine(); // skip header
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
@@ -63,54 +64,55 @@ public class App {
     }
 
     // private static void processCommand(String input, Game game, Player player) {
-    //     switch (input.toLowerCase()) {
-    //         case "t":
-    //         case "turn":
-    //             game.processTurn();
-    //             break;
-    //         case "hand":
-    //             game.showHand(player);
-    //             break;
-    //         case "city":
-    //             game.showCity(player);
-    //             break;
-    //         case "all":
-    //             game.showAll();
-    //             break;
-    //         case "gold":
-    //             System.out.println("You have " + player.getGold() + " gold.");
-    //             break;
-    //         case "action":
-    //             game.describeAction(player);
-    //             break;
-    //         case "help":
-    //             System.out.println("Commands: turn (t), hand, city, all, gold, action, help");
-    //             break;
-    //         case "save":
-    //             game.saveGame("citadels_save.json");
-    //             System.out.println("Game saved.");
-    //             break;
-    //         case "load":
-    //             game.loadGame("citadels_save.json");
-    //             System.out.println("Game loaded.");
-    //             break;
-    //         case "quit":
-    //             System.exit(0);
-    //             break;
-    //         default:
-    //             if (input.startsWith("build ")) {
-    //                 try {
-    //                     int cardNum = Integer.parseInt(input.substring(6));
-    //                     game.build(player, cardNum);
-    //                 } catch (NumberFormatException e) {
-    //                     System.out.println("Invalid card number.");
-    //                 }
-    //             } else if (input.startsWith("info ")) {
-    //                 game.showInfo(input.substring(5));
-    //             } else {
-    //                 System.out.println("Unknown command. Type 'help' for commands.");
-    //             }
-    //     }
+    // switch (input.toLowerCase()) {
+    // case "t":
+    // case "turn":
+    // game.processTurn();
+    // break;
+    // case "hand":
+    // game.showHand(player);
+    // break;
+    // case "city":
+    // game.showCity(player);
+    // break;
+    // case "all":
+    // game.showAll();
+    // break;
+    // case "gold":
+    // System.out.println("You have " + player.getGold() + " gold.");
+    // break;
+    // case "action":
+    // game.describeAction(player);
+    // break;
+    // case "help":
+    // System.out.println("Commands: turn (t), hand, city, all, gold, action,
+    // help");
+    // break;
+    // case "save":
+    // game.saveGame("citadels_save.json");
+    // System.out.println("Game saved.");
+    // break;
+    // case "load":
+    // game.loadGame("citadels_save.json");
+    // System.out.println("Game loaded.");
+    // break;
+    // case "quit":
+    // System.exit(0);
+    // break;
+    // default:
+    // if (input.startsWith("build ")) {
+    // try {
+    // int cardNum = Integer.parseInt(input.substring(6));
+    // game.build(player, cardNum);
+    // } catch (NumberFormatException e) {
+    // System.out.println("Invalid card number.");
+    // }
+    // } else if (input.startsWith("info ")) {
+    // game.showInfo(input.substring(5));
+    // } else {
+    // System.out.println("Unknown command. Type 'help' for commands.");
+    // }
+    // }
     // }
 
     public static void main(String[] args) {
@@ -169,21 +171,24 @@ public class App {
             // Check for game over condition immediately after turns are processed
             // (game.isOver() might be updated during turnPhase if a win condition is met)
             if (game.isOver()) {
-                // scoreManager.showScores() is often called within game.turnPhase() or game.isOver() when true
-                // If not, it might be needed here. For now, assume turnPhase or isOver handles final score display.
-                break; 
+                // scoreManager.showScores() is often called within game.turnPhase() or
+                // game.isOver() when true
+                // If not, it might be needed here. For now, assume turnPhase or isOver handles
+                // final score display.
+                break;
             }
 
             // End of round logic
             game.setRound(game.getRound() + 1);
             // Optional: Add a small delay or prompt to continue to next round for better UX
             // System.out.println("Press Enter to start next round...");
-            // scanner.nextLine(); 
+            // scanner.nextLine();
         }
 
         System.out.println("Game has ended.");
-        // game.showScores(); // Ensure scores are shown if not handled by turnPhase when game ends.
-        
+        // game.showScores(); // Ensure scores are shown if not handled by turnPhase
+        // when game ends.
+
         // Clean up
         scanner.close();
     }

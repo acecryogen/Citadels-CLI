@@ -57,6 +57,10 @@ public class Player {
         return hand;
     }
 
+    public void setHand(List<DistrictCard> hand) {
+        this.hand = hand;
+    }
+
     public List<DistrictCard> getCity() {
         return city;
     }
@@ -86,30 +90,34 @@ public class Player {
             hand = new ArrayList<>();
         }
         if (card != null) { // Prevent adding null cards
-           hand.add(card);
+            hand.add(card);
         }
     }
 
     public void buildDistrict(DistrictCard card) {
         // Check if district already exists in city
         if (city.stream().anyMatch(d -> d.name.equals(card.name))) {
-            // System.out.println("Cannot build " + card.name + ": already in city."); // Message handled by Game.build
+            // System.out.println("Cannot build " + card.name + ": already in city."); //
+            // Message handled by Game.build
             return;
         }
         if (gold < card.cost) {
-            // System.out.println("Cannot build " + card.name + ": not enough gold."); // Message handled by Game.build
+            // System.out.println("Cannot build " + card.name + ": not enough gold."); //
+            // Message handled by Game.build
             return;
         }
 
         // Remove from hand if present
         boolean removed = hand.remove(card); // Ensure it was actually in hand
         if (!removed) {
-            // This case should ideally not happen if card validation is done before calling.
-            // System.out.println("Cannot build " + card.name + ": not in hand (or different instance).");
+            // This case should ideally not happen if card validation is done before
+            // calling.
+            // System.out.println("Cannot build " + card.name + ": not in hand (or different
+            // instance).");
             // For now, if it's not in hand, don't build. Game.build() checks hand by index.
-            // This direct buildDistrict method is mostly for internal setup or AI that has direct card reference.
+            // This direct buildDistrict method is mostly for internal setup or AI that has
+            // direct card reference.
         }
-
 
         // Add to city and spend gold
         city.add(card);

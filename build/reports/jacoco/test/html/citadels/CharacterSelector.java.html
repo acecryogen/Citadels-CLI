@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CharacterSelector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">CharacterSelector.java</span></div><h1>CharacterSelector.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+public class CharacterSelector {
+    private Game game;
+    private List&lt;Player&gt; players;
+    private List&lt;CharacterCard&gt; characterDeck;
+    private Scanner scanner;
+<span class="nc" id="L15">    private int killedCharacterRank = -1; // Placeholder for actual logic</span>
+<span class="nc" id="L16">    private int robbedCharacterRank = -1; // Placeholder for actual logic</span>
+
+<span class="nc" id="L18">    public CharacterSelector(Game game, List&lt;Player&gt; players, List&lt;CharacterCard&gt; characterDeck) {</span>
+<span class="nc" id="L19">        this.game = game;</span>
+<span class="nc" id="L20">        this.players = players;</span>
+<span class="nc" id="L21">        this.characterDeck = characterDeck;</span>
+<span class="nc" id="L22">    }</span>
+
+    public void setScanner(Scanner scanner) {
+<span class="nc" id="L25">        this.scanner = scanner;</span>
+<span class="nc" id="L26">    }</span>
+
+    // Added placeholder getter
+    public int getKilledCharacterRank() {
+        // In a real implementation, this would be determined by Assassin's choice
+<span class="nc" id="L31">        return killedCharacterRank; </span>
+    }
+    
+    // Added placeholder getter
+    public int getRobbedCharacterRank() {
+        // In a real implementation, this would be determined by Thief's choice
+<span class="nc" id="L37">        return robbedCharacterRank;</span>
+    }
+
+    public Map&lt;Integer, Player&gt; selectCharacters(int crownedPlayerIndex) {
+<span class="nc" id="L41">        Map&lt;Integer, Player&gt; characterToPlayer = new HashMap&lt;&gt;();</span>
+        // Reset killed/robbed status at the start of selection
+<span class="nc" id="L43">        this.killedCharacterRank = -1;</span>
+<span class="nc" id="L44">        this.robbedCharacterRank = -1;</span>
+<span class="nc" id="L45">        List&lt;CharacterCard&gt; availableCharacters = setupAvailableCharacters();</span>
+<span class="nc" id="L46">        List&lt;Player&gt; pickOrder = determinePickOrder(crownedPlayerIndex);</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (Player p : pickOrder) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (p.isHuman()) {</span>
+<span class="nc" id="L50">                handleHumanSelection(p, availableCharacters, characterToPlayer);</span>
+            } else {
+<span class="nc" id="L52">                handleAISelection(p, availableCharacters, characterToPlayer);</span>
+            }
+<span class="nc" id="L54">        }</span>
+
+<span class="nc" id="L56">        return characterToPlayer;</span>
+    }
+
+    private List&lt;CharacterCard&gt; setupAvailableCharacters() {
+<span class="nc" id="L60">        List&lt;CharacterCard&gt; available = new ArrayList&lt;&gt;(characterDeck);</span>
+<span class="nc" id="L61">        Collections.shuffle(available);</span>
+
+        // Remove face down card
+<span class="nc" id="L64">        available.remove(0);</span>
+<span class="nc" id="L65">        System.out.println(&quot;A mystery character was removed.&quot;);</span>
+
+        // Remove face up cards based on player count
+<span class="nc" id="L68">        removeFaceUpCards(available);</span>
+
+<span class="nc" id="L70">        return available;</span>
+    }
+
+    private void removeFaceUpCards(List&lt;CharacterCard&gt; available) {
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        int faceUpToRemove = players.size() == 4 ? 2 : (players.size() == 5 ? 1 : 0);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        for (int i = 0; i &lt; faceUpToRemove; i++) {</span>
+<span class="nc" id="L76">            CharacterCard removed = available.remove(0);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (removed.getName().equals(&quot;King&quot;)) {</span>
+<span class="nc" id="L78">                available.add(removed);</span>
+<span class="nc" id="L79">                Collections.shuffle(available);</span>
+<span class="nc" id="L80">                removed = available.remove(0);</span>
+            }
+<span class="nc" id="L82">            System.out.println(removed.getName() + &quot; was removed.&quot;);</span>
+        }
+<span class="nc" id="L84">    }</span>
+
+    public List&lt;Player&gt; determinePickOrder(int crownedPlayerIndex) {
+<span class="nc" id="L87">        List&lt;Player&gt; pickOrder = new ArrayList&lt;&gt;();</span>
+
+        // Add players starting from the crowned player
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        for (int i = crownedPlayerIndex; i &lt; players.size(); i++) {</span>
+<span class="nc" id="L91">            pickOrder.add(players.get(i));</span>
+        }
+
+        // Add players before the crowned player
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        for (int i = 0; i &lt; crownedPlayerIndex; i++) {</span>
+<span class="nc" id="L96">            pickOrder.add(players.get(i));</span>
+        }
+
+<span class="nc" id="L99">        return pickOrder;</span>
+    }
+
+    private void handleHumanSelection(Player player, List&lt;CharacterCard&gt; availableCharacters,
+            Map&lt;Integer, Player&gt; characterToPlayer) {
+<span class="nc" id="L104">        System.out.println(&quot;Available characters:&quot;);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        for (int i = 0; i &lt; availableCharacters.size(); i++) {</span>
+<span class="nc" id="L106">            System.out.println((i + 1) + &quot;: &quot; + availableCharacters.get(i).getName());</span>
+        }
+
+<span class="nc" id="L109">        System.out.print(&quot;Choose a character (number): &quot;);</span>
+<span class="nc" id="L110">        int choice = -1;</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">        while (choice &lt; 1 || choice &gt; availableCharacters.size()) {</span>
+            try {
+<span class="nc" id="L113">                choice = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L114">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L115">                System.out.println(&quot;Invalid input. Please enter a number.&quot;);</span>
+<span class="nc" id="L116">            }</span>
+        }
+
+<span class="nc" id="L119">        CharacterCard chosen = availableCharacters.remove(choice - 1);</span>
+<span class="nc" id="L120">        characterToPlayer.put(chosen.getNumber(), player);</span>
+<span class="nc" id="L121">        player.setCharacter(chosen);</span>
+<span class="nc" id="L122">        System.out.println(&quot;You chose: &quot; + chosen.getName());</span>
+<span class="nc" id="L123">    }</span>
+
+    private void handleAISelection(Player player, List&lt;CharacterCard&gt; availableCharacters,
+            Map&lt;Integer, Player&gt; characterToPlayer) {
+<span class="nc" id="L127">        CharacterCard chosen = availableCharacters.remove(0); // AI picks the first available character</span>
+<span class="nc" id="L128">        characterToPlayer.put(chosen.getNumber(), player);</span>
+<span class="nc" id="L129">        player.setCharacter(chosen);</span>
+<span class="nc" id="L130">        System.out.println(&quot;Player &quot; + player.getId() + &quot; chose: &quot; + chosen.getName());</span>
+<span class="nc" id="L131">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

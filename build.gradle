@@ -8,21 +8,18 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java'
-    // id 'application' // Will be applied using the older method
+
+    // Apply the application plugin to add support for building a CLI application
+    id 'application'
+
     id 'jacoco'
 }
-
-apply plugin: 'application'
-
 version = '1.0'
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     mavenCentral()
 }
-
-// Define the main class for the application plugin
-mainClassName = 'citadels.App'
 
 dependencies {
     // This dependency is used by the application.
@@ -37,33 +34,26 @@ dependencies {
 
     // Use JUnit Jupiter Engine for testing.
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
-    
-    // Launcher for JUnit Platform (might be needed for older Gradle to discover/run JUnit 5 tests)
-    // testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.6.2' // Already have jupiter-engine
 }
 
-// application { // This block is removed
-//    // Define the main class for the application
-//    mainClassName = 'citadels.App'
-// }
+application {
+    // Define the main class for the application
+    getMainClass().set('citadels.App')
+}
 
 test {
     // Use junit platform for unit tests
-    useJUnitPlatform() // Reinstated for gradle test
+    useJUnitPlatform()
     ignoreFailures = true
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	archiveName = "citadels.jar" // Changed from archiveFileName
+	archiveFileName = "citadels.jar"
     manifest {
         attributes 'Main-Class': 'citadels.App'
     }
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
-}
-
-run { // Changed from tasks.named('run')
-    standardInput = System.in
 }

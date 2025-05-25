@@ -55,7 +55,6 @@ public class CharacterAbilities {
         return -1;
     }
 
-    // Move each character's ability handling to separate private methods
     private int handleAssassin(Player player) {
         if (scanner != null) {
             System.out.println(
@@ -72,8 +71,7 @@ public class CharacterAbilities {
             System.out.println("You chose to kill: " + getCharacterName(target));
             return target;
         }
-        // AI: pick random valid target
-        return 2 + new Random().nextInt(7);
+        return 2 + new Random().nextInt(7); // AI: pick random valid target
     }
 
     private int handleThief(Player player) {
@@ -92,7 +90,7 @@ public class CharacterAbilities {
             System.out.println("You chose to steal from: " + getCharacterName(target));
             return target;
         }
-        return 3 + new Random().nextInt(6);
+        return 3 + new Random().nextInt(6); // AI: pick random valid target
     }
 
     private void handleMagician(Player player) {
@@ -135,7 +133,10 @@ public class CharacterAbilities {
 
     private void handleArchitect(Player player) {
         for (int i = 0; i < 2; i++) {
-            player.addToHand(districtDeck.draw());
+            DistrictCard card = districtDeck.draw();
+            if (card != null) {
+                player.addToHand(card);
+            }
         }
         System.out.println("Architect: You drew 2 extra cards.");
     }
@@ -155,21 +156,39 @@ public class CharacterAbilities {
     }
 
     private void handleMagicianAction(Player player, String action) {
-        System.out.println("Magician action not implemented yet.");
+        if (action.startsWith("swap")) {
+            int targetPlayerId = Integer.parseInt(action.split(" ")[1]);
+            Player targetPlayer = players.stream().filter(p -> p.getId() == targetPlayerId).findFirst().orElse(null);
+            if (targetPlayer != null) {
+                List<DistrictCard> temp = player.getHand();
+                player.setHand(targetPlayer.getHand());
+                targetPlayer.setHand(temp);
+                System.out.println("You swapped hands with Player " + targetPlayerId);
+            } else {
+                System.out.println("Invalid player number.");
+            }
+        } else if (action.startsWith("redraw")) {
+            System.out.println("Redraw logic not implemented yet.");
+        } else {
+            System.out.println("Invalid action.");
+        }
     }
 
     // Placeholder for AI character ability logic
     public void handleAbilityAI(Player player, int killedCharacter, int robbedCharacter) {
         CharacterCard character = player.getCharacter();
-        if (character == null) return;
+        if (character == null)
+            return;
 
         // AI doesn't use scanner, makes decisions programmatically
-        System.out.println("Player " + player.getId() + " (" + character.getName() + ") is considering its AI ability logic.");
+        System.out.println(
+                "Player " + player.getId() + " (" + character.getName() + ") is considering its AI ability logic.");
         // Basic AI logic placeholders:
         switch (character.getName()) {
             case "Assassin":
                 // AI Assassin might pick a random player/character to "kill"
-                // This would typically involve updating game state (e.g. game.setKilledCharacterThisRound(targetRank))
+                // This would typically involve updating game state (e.g.
+                // game.setKilledCharacterThisRound(targetRank))
                 System.out.println("AI Assassin: Deciding who to kill (not fully implemented).");
                 break;
             case "Thief":
@@ -180,14 +199,16 @@ public class CharacterAbilities {
                 // AI Magician might swap with poorest player or redraw if hand is bad
                 System.out.println("AI Magician: Deciding on magic action (not fully implemented).");
                 break;
-            // King, Bishop, Merchant abilities are passive income, already handled by their specific methods if called during turn.
+            // King, Bishop, Merchant abilities are passive income, already handled by their
+            // specific methods if called during turn.
             // Architect draws cards, already handled.
             case "Warlord":
                 // AI Warlord might destroy cheapest district of richest player
                 System.out.println("AI Warlord: Deciding what to destroy (not fully implemented).");
                 break;
             default:
-                // System.out.println("AI " + character.getName() + ": No specific AI ability action defined here.");
+                // System.out.println("AI " + character.getName() + ": No specific AI ability
+                // action defined here.");
                 break;
         }
     }

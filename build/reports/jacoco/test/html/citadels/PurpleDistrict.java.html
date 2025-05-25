@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PurpleDistrict.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">PurpleDistrict.java</span></div><h1>PurpleDistrict.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.util.*;
+
+public class PurpleDistrict {
+    private Game game;
+    private Deck districtDeck;
+    private Scanner scanner;
+
+<span class="nc" id="L10">    public PurpleDistrict(Game game, Deck districtDeck) {</span>
+<span class="nc" id="L11">        this.game = game;</span>
+<span class="nc" id="L12">        this.districtDeck = districtDeck;</span>
+<span class="nc" id="L13">    }</span>
+
+    public void setScanner(Scanner scanner) {
+<span class="nc" id="L16">        this.scanner = scanner;</span>
+<span class="nc" id="L17">    }</span>
+
+    public void handleAbility(Player player, DistrictCard card) {
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (!&quot;purple&quot;.equals(card.color))</span>
+<span class="nc" id="L21">            return;</span>
+
+<span class="nc bnc" id="L23" title="All 8 branches missed.">        switch (card.name) {</span>
+            case &quot;Laboratory&quot;:
+<span class="nc" id="L25">                handleLaboratory(player);</span>
+<span class="nc" id="L26">                break;</span>
+            case &quot;Smithy&quot;:
+<span class="nc" id="L28">                handleSmithy(player);</span>
+<span class="nc" id="L29">                break;</span>
+            case &quot;Graveyard&quot;:
+<span class="nc" id="L31">                System.out</span>
+<span class="nc" id="L32">                        .println(&quot;Graveyard: If one of your districts is destroyed, you may pay 1 gold to recover it.&quot;);</span>
+<span class="nc" id="L33">                break;</span>
+            case &quot;Haunted City&quot;:
+            case &quot;School of Magic&quot;:
+<span class="nc" id="L36">                System.out.println(card.name + &quot;: Counts as any color for color bonus.&quot;);</span>
+<span class="nc" id="L37">                break;</span>
+            case &quot;Keep&quot;:
+<span class="nc" id="L39">                System.out.println(&quot;Keep: This district cannot be destroyed.&quot;);</span>
+<span class="nc" id="L40">                break;</span>
+            case &quot;Observatory&quot;:
+<span class="nc" id="L42">                System.out.println(&quot;Observatory: When you draw cards, draw 3 and keep 1.&quot;);</span>
+<span class="nc" id="L43">                break;</span>
+            case &quot;Dragon Gate&quot;:
+            case &quot;University&quot;:
+<span class="nc" id="L46">                System.out.println(card.name + &quot;: Worth 8 points instead of 6.&quot;);</span>
+<span class="nc" id="L47">                break;</span>
+            default:
+<span class="nc" id="L49">                System.out.println(&quot;Purple district ability: &quot; + card.text);</span>
+        }
+<span class="nc" id="L51">    }</span>
+
+    private void handleLaboratory(Player player) {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (player.getHand().isEmpty()) {</span>
+<span class="nc" id="L55">            System.out.println(&quot;Laboratory: No cards to discard.&quot;);</span>
+<span class="nc" id="L56">            return;</span>
+        }
+<span class="nc" id="L58">        System.out.println(&quot;Laboratory: Discard a card from your hand to gain 1 gold? [yes/no]&quot;);</span>
+<span class="nc" id="L59">        String labAns = scanner.nextLine().trim().toLowerCase();</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (labAns.equals(&quot;yes&quot;)) {</span>
+<span class="nc" id="L61">            game.showHand(player);</span>
+<span class="nc" id="L62">            System.out.print(&quot;Which card to discard? (number): &quot;);</span>
+            try {
+<span class="nc" id="L64">                int idx = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc bnc" id="L65" title="All 4 branches missed.">                if (idx &gt;= 1 &amp;&amp; idx &lt;= player.getHand().size()) {</span>
+<span class="nc" id="L66">                    player.addGold(1);</span>
+<span class="nc" id="L67">                    player.removeFromHand(player.getHand().get(idx - 1));</span>
+<span class="nc" id="L68">                    System.out.println(&quot;Gained 1 gold.&quot;);</span>
+                }
+<span class="nc" id="L70">            } catch (Exception e) {</span>
+<span class="nc" id="L71">                System.out.println(&quot;Invalid input.&quot;);</span>
+<span class="nc" id="L72">            }</span>
+        }
+<span class="nc" id="L74">    }</span>
+
+    private void handleSmithy(Player player) {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (player.getGold() &lt; 2) {</span>
+<span class="nc" id="L78">            System.out.println(&quot;Smithy: Not enough gold to use ability.&quot;);</span>
+<span class="nc" id="L79">            return;</span>
+        }
+<span class="nc" id="L81">        System.out.println(&quot;Smithy: Pay 2 gold to draw 3 cards? [yes/no]&quot;);</span>
+<span class="nc" id="L82">        String smithyAns = scanner.nextLine().trim().toLowerCase();</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (smithyAns.equals(&quot;yes&quot;)) {</span>
+<span class="nc" id="L84">            player.spendGold(2);</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            for (int i = 0; i &lt; 3; i++) {</span>
+<span class="nc" id="L86">                player.addToHand(districtDeck.draw());</span>
+            }
+<span class="nc" id="L88">            System.out.println(&quot;You drew 3 cards.&quot;);</span>
+        }
+<span class="nc" id="L90">    }</span>
+
+    // Add other purple district handling methods...
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

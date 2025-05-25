@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CharacterAbilities.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">CharacterAbilities.java</span></div><h1>CharacterAbilities.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.util.*;
+
+public class CharacterAbilities {
+    private Game game;
+    private List&lt;Player&gt; players;
+    private Deck districtDeck;
+    private List&lt;CharacterCard&gt; characterDeck;
+    private Map&lt;Integer, Player&gt; characterToPlayer;
+    private Scanner scanner;
+
+    public CharacterAbilities(Game game, List&lt;Player&gt; players, Deck districtDeck,
+<span class="nc" id="L14">            List&lt;CharacterCard&gt; characterDeck, Map&lt;Integer, Player&gt; characterToPlayer) {</span>
+<span class="nc" id="L15">        this.game = game;</span>
+<span class="nc" id="L16">        this.players = players;</span>
+<span class="nc" id="L17">        this.districtDeck = districtDeck;</span>
+<span class="nc" id="L18">        this.characterDeck = characterDeck;</span>
+<span class="nc" id="L19">        this.characterToPlayer = characterToPlayer;</span>
+<span class="nc" id="L20">    }</span>
+
+    public void setScanner(Scanner scanner) {
+<span class="nc" id="L23">        this.scanner = scanner;</span>
+<span class="nc" id="L24">    }</span>
+
+    public int handleAbility(Player player, int killedCharacter, int robbedCharacter) {
+<span class="nc" id="L27">        CharacterCard character = player.getCharacter();</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (character == null)</span>
+<span class="nc" id="L29">            return -1;</span>
+
+<span class="nc bnc" id="L31" title="All 9 branches missed.">        switch (character.getName()) {</span>
+            case &quot;Assassin&quot;:
+<span class="nc" id="L33">                return handleAssassin(player);</span>
+            case &quot;Thief&quot;:
+<span class="nc" id="L35">                return handleThief(player);</span>
+            case &quot;Magician&quot;:
+<span class="nc" id="L37">                handleMagician(player);</span>
+<span class="nc" id="L38">                break;</span>
+            case &quot;King&quot;:
+<span class="nc" id="L40">                handleKing(player);</span>
+<span class="nc" id="L41">                break;</span>
+            case &quot;Bishop&quot;:
+<span class="nc" id="L43">                handleBishop(player);</span>
+<span class="nc" id="L44">                break;</span>
+            case &quot;Merchant&quot;:
+<span class="nc" id="L46">                handleMerchant(player);</span>
+<span class="nc" id="L47">                break;</span>
+            case &quot;Architect&quot;:
+<span class="nc" id="L49">                handleArchitect(player);</span>
+<span class="nc" id="L50">                break;</span>
+            case &quot;Warlord&quot;:
+<span class="nc" id="L52">                handleWarlord(player, killedCharacter);</span>
+                break;
+        }
+<span class="nc" id="L55">        return -1;</span>
+    }
+
+    private int handleAssassin(Player player) {
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (scanner != null) {</span>
+<span class="nc" id="L60">            System.out.println(</span>
+                    &quot;Who do you want to kill? (2-Thief, 3-Magician, 4-King, 5-Bishop, 6-Merchant, 7-Architect, 8-Warlord)&quot;);
+<span class="nc" id="L62">            int target = -1;</span>
+<span class="nc bnc" id="L63" title="All 4 branches missed.">            while (target &lt; 2 || target &gt; 8) {</span>
+<span class="nc" id="L64">                System.out.print(&quot;Enter character number to kill: &quot;);</span>
+                try {
+<span class="nc" id="L66">                    target = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L67">                } catch (Exception e) {</span>
+<span class="nc" id="L68">                    target = -1;</span>
+<span class="nc" id="L69">                }</span>
+            }
+<span class="nc" id="L71">            System.out.println(&quot;You chose to kill: &quot; + getCharacterName(target));</span>
+<span class="nc" id="L72">            return target;</span>
+        }
+<span class="nc" id="L74">        return 2 + new Random().nextInt(7); // AI: pick random valid target</span>
+    }
+
+    private int handleThief(Player player) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (scanner != null) {</span>
+<span class="nc" id="L79">            System.out.println(</span>
+                    &quot;Who do you want to steal from? (3-Magician, 4-King, 5-Bishop, 6-Merchant, 7-Architect, 8-Warlord)&quot;);
+<span class="nc" id="L81">            int target = -1;</span>
+<span class="nc bnc" id="L82" title="All 4 branches missed.">            while (target &lt; 3 || target &gt; 8) {</span>
+<span class="nc" id="L83">                System.out.print(&quot;Enter character number to steal from: &quot;);</span>
+                try {
+<span class="nc" id="L85">                    target = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L86">                } catch (Exception e) {</span>
+<span class="nc" id="L87">                    target = -1;</span>
+<span class="nc" id="L88">                }</span>
+            }
+<span class="nc" id="L90">            System.out.println(&quot;You chose to steal from: &quot; + getCharacterName(target));</span>
+<span class="nc" id="L91">            return target;</span>
+        }
+<span class="nc" id="L93">        return 3 + new Random().nextInt(6); // AI: pick random valid target</span>
+    }
+
+    private void handleMagician(Player player) {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (scanner != null) {</span>
+<span class="nc" id="L98">            System.out.println(&quot;Magician: swap hand with another player or redraw cards.&quot;);</span>
+<span class="nc" id="L99">            System.out.print(&quot;Type 'swap &lt;player number&gt;' or 'redraw &lt;card numbers,comma separated&gt;': &quot;);</span>
+<span class="nc" id="L100">            String action = scanner.nextLine().trim();</span>
+<span class="nc" id="L101">            handleMagicianAction(player, action);</span>
+        }
+<span class="nc" id="L103">    }</span>
+
+    private void handleKing(Player player) {
+<span class="nc" id="L106">        int yellow = (int) player.getCity().stream().filter(c -&gt; c.color.equals(&quot;yellow&quot;)).count();</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (yellow &gt; 0) {</span>
+<span class="nc" id="L108">            player.addGold(yellow);</span>
+<span class="nc" id="L109">            System.out.println(&quot;King: You gained &quot; + yellow + &quot; gold for yellow districts.&quot;);</span>
+        }
+<span class="nc" id="L111">        game.setCrownedPlayerIndex(players.indexOf(player));</span>
+<span class="nc" id="L112">        players.forEach(p -&gt; p.setCrown(false));</span>
+<span class="nc" id="L113">        player.setCrown(true);</span>
+<span class="nc" id="L114">    }</span>
+
+    private void handleBishop(Player player) {
+<span class="nc" id="L117">        int blueDistricts = (int) player.getCity().stream().filter(c -&gt; c.color.equals(&quot;blue&quot;)).count();</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (blueDistricts &gt; 0) {</span>
+<span class="nc" id="L119">            player.addGold(blueDistricts);</span>
+<span class="nc" id="L120">            System.out.println(&quot;Bishop: You gained &quot; + blueDistricts + &quot; gold for blue districts.&quot;);</span>
+        }
+<span class="nc" id="L122">    }</span>
+
+    private void handleMerchant(Player player) {
+<span class="nc" id="L125">        int greenDistricts = (int) player.getCity().stream().filter(c -&gt; c.color.equals(&quot;green&quot;)).count();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (greenDistricts &gt; 0) {</span>
+<span class="nc" id="L127">            player.addGold(greenDistricts);</span>
+<span class="nc" id="L128">            System.out.println(&quot;Merchant: You gained &quot; + greenDistricts + &quot; gold for green districts.&quot;);</span>
+        }
+<span class="nc" id="L130">        player.addGold(1); // Merchant always gains 1 extra gold</span>
+<span class="nc" id="L131">        System.out.println(&quot;Merchant: You gained 1 extra gold.&quot;);</span>
+<span class="nc" id="L132">    }</span>
+
+    private void handleArchitect(Player player) {
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        for (int i = 0; i &lt; 2; i++) {</span>
+<span class="nc" id="L136">            DistrictCard card = districtDeck.draw();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (card != null) {</span>
+<span class="nc" id="L138">                player.addToHand(card);</span>
+            }
+        }
+<span class="nc" id="L141">        System.out.println(&quot;Architect: You drew 2 extra cards.&quot;);</span>
+<span class="nc" id="L142">    }</span>
+
+    private void handleWarlord(Player player, int killedCharacter) {
+<span class="nc" id="L145">        System.out.println(&quot;Warlord: Destroy a district for gold.&quot;);</span>
+        // Add logic for destroying a district
+<span class="nc" id="L147">    }</span>
+
+    private String getCharacterName(int characterNumber) {
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        for (CharacterCard card : characterDeck) {</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            if (card.getNumber() == characterNumber) {</span>
+<span class="nc" id="L152">                return card.getName();</span>
+            }
+<span class="nc" id="L154">        }</span>
+<span class="nc" id="L155">        return &quot;Unknown&quot;;</span>
+    }
+
+    private void handleMagicianAction(Player player, String action) {
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (action.startsWith(&quot;swap&quot;)) {</span>
+<span class="nc" id="L160">            int targetPlayerId = Integer.parseInt(action.split(&quot; &quot;)[1]);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">            Player targetPlayer = players.stream().filter(p -&gt; p.getId() == targetPlayerId).findFirst().orElse(null);</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            if (targetPlayer != null) {</span>
+<span class="nc" id="L163">                List&lt;DistrictCard&gt; temp = player.getHand();</span>
+<span class="nc" id="L164">                player.setHand(targetPlayer.getHand());</span>
+<span class="nc" id="L165">                targetPlayer.setHand(temp);</span>
+<span class="nc" id="L166">                System.out.println(&quot;You swapped hands with Player &quot; + targetPlayerId);</span>
+<span class="nc" id="L167">            } else {</span>
+<span class="nc" id="L168">                System.out.println(&quot;Invalid player number.&quot;);</span>
+            }
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        } else if (action.startsWith(&quot;redraw&quot;)) {</span>
+<span class="nc" id="L171">            System.out.println(&quot;Redraw logic not implemented yet.&quot;);</span>
+        } else {
+<span class="nc" id="L173">            System.out.println(&quot;Invalid action.&quot;);</span>
+        }
+<span class="nc" id="L175">    }</span>
+
+    // Placeholder for AI character ability logic
+    public void handleAbilityAI(Player player, int killedCharacter, int robbedCharacter) {
+<span class="nc" id="L179">        CharacterCard character = player.getCharacter();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (character == null)</span>
+<span class="nc" id="L181">            return;</span>
+
+        // AI doesn't use scanner, makes decisions programmatically
+<span class="nc" id="L184">        System.out.println(</span>
+<span class="nc" id="L185">                &quot;Player &quot; + player.getId() + &quot; (&quot; + character.getName() + &quot;) is considering its AI ability logic.&quot;);</span>
+        // Basic AI logic placeholders:
+<span class="nc bnc" id="L187" title="All 5 branches missed.">        switch (character.getName()) {</span>
+            case &quot;Assassin&quot;:
+                // AI Assassin might pick a random player/character to &quot;kill&quot;
+                // This would typically involve updating game state (e.g.
+                // game.setKilledCharacterThisRound(targetRank))
+<span class="nc" id="L192">                System.out.println(&quot;AI Assassin: Deciding who to kill (not fully implemented).&quot;);</span>
+<span class="nc" id="L193">                break;</span>
+            case &quot;Thief&quot;:
+                // AI Thief might pick a random player/character to &quot;rob&quot;
+<span class="nc" id="L196">                System.out.println(&quot;AI Thief: Deciding who to rob (not fully implemented).&quot;);</span>
+<span class="nc" id="L197">                break;</span>
+            case &quot;Magician&quot;:
+                // AI Magician might swap with poorest player or redraw if hand is bad
+<span class="nc" id="L200">                System.out.println(&quot;AI Magician: Deciding on magic action (not fully implemented).&quot;);</span>
+<span class="nc" id="L201">                break;</span>
+            // King, Bishop, Merchant abilities are passive income, already handled by their
+            // specific methods if called during turn.
+            // Architect draws cards, already handled.
+            case &quot;Warlord&quot;:
+                // AI Warlord might destroy cheapest district of richest player
+<span class="nc" id="L207">                System.out.println(&quot;AI Warlord: Deciding what to destroy (not fully implemented).&quot;);</span>
+<span class="nc" id="L208">                break;</span>
+            default:
+                // System.out.println(&quot;AI &quot; + character.getName() + &quot;: No specific AI ability
+                // action defined here.&quot;);
+                break;
+        }
+<span class="nc" id="L214">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Citadels</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package citadels;
+
+import java.util.*;
+
+public class Game {
+    private List&lt;Player&gt; players;
+    private Deck districtDeck;
+    private List&lt;CharacterCard&gt; characterDeck;
+    private int crownedPlayerIndex;
+    private boolean gameOver;
+<span class="nc" id="L11">    private int round = 1;</span>
+    // These would be set during character selection each round
+<span class="nc" id="L13">    private int killedCharacterThisRound = -1; // Rank of the killed character</span>
+<span class="nc" id="L14">    private int robbedCharacterThisRound = -1; // Rank of the robbed character</span>
+
+    private List&lt;CharacterCard&gt; availableCharacters;
+    private Map&lt;Integer, Player&gt; characterToPlayer; // This should be reset and repopulated each round
+<span class="nc" id="L18">    private boolean debugMode = false;</span>
+
+    private CharacterAbilities characterAbilities;
+    private PurpleDistrict purpleDistrict;
+    private ScoreManager scoreManager;
+    private SaveLoad saveLoad;
+    private TurnManager turnManager;
+    private CharacterSelector characterSelector;
+    private GameDebugger debugger;
+
+    private Scanner scanner;
+
+<span class="nc" id="L30">    public Game(List&lt;Player&gt; players, Deck districtDeck, List&lt;CharacterCard&gt; characterDeck) {</span>
+<span class="nc" id="L31">        this.players = players;</span>
+<span class="nc" id="L32">        this.districtDeck = districtDeck;</span>
+<span class="nc" id="L33">        this.characterDeck = characterDeck;</span>
+<span class="nc" id="L34">        this.crownedPlayerIndex = new Random().nextInt(players.size());</span>
+<span class="nc" id="L35">        this.gameOver = false;</span>
+<span class="nc" id="L36">        this.characterToPlayer = new HashMap&lt;&gt;(); // Initialize the map</span>
+
+        // Initialize handlers
+        // Pass the characterToPlayer map, which will be updated by CharacterSelector
+<span class="nc" id="L40">        this.characterAbilities = new CharacterAbilities(this, players, districtDeck, characterDeck, this.characterToPlayer);</span>
+<span class="nc" id="L41">        this.purpleDistrict = new PurpleDistrict(this, districtDeck);</span>
+<span class="nc" id="L42">        this.scoreManager = new ScoreManager(players, round);</span>
+<span class="nc" id="L43">        this.saveLoad = new SaveLoad(this, players, districtDeck, characterDeck);</span>
+<span class="nc" id="L44">        this.turnManager = new TurnManager(this, players, districtDeck, this.characterToPlayer);</span>
+<span class="nc" id="L45">        this.characterSelector = new CharacterSelector(this, players, characterDeck); // Pass the main character deck</span>
+<span class="nc" id="L46">        this.debugger = new GameDebugger(this, players, characterDeck);</span>
+
+<span class="nc" id="L48">        initialDeal();</span>
+<span class="nc" id="L49">    }</span>
+
+    private void initialDeal() {
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (Player p : players) {</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            for (int i = 0; i &lt; 4; i++) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                if (districtDeck.cardsLeft() &gt; 0) { // Check if deck has cards</span>
+<span class="nc" id="L55">                    p.addToHand(districtDeck.draw());</span>
+                }
+            }
+            // p.addGold(0); // Players start with 2 gold by default in Player constructor
+<span class="nc" id="L59">        }</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (!players.isEmpty()) {</span>
+<span class="nc" id="L61">            players.get(crownedPlayerIndex % players.size()).setCrown(true); // Ensure crownedPlayerIndex is valid</span>
+        }
+<span class="nc" id="L63">    }</span>
+
+    public boolean isOver() {
+<span class="nc" id="L66">        return gameOver;</span>
+    }
+
+    // Added setter for gameOver state
+    public void setOver(boolean gameOver) {
+<span class="nc" id="L71">        this.gameOver = gameOver;</span>
+<span class="nc" id="L72">    }</span>
+
+    public int getRound() {
+<span class="nc" id="L75">        return round;</span>
+    }
+
+    public void setRound(int round) {
+<span class="nc" id="L79">        this.round = round;</span>
+<span class="nc" id="L80">    }</span>
+
+    public int getCrownedPlayerIndex() {
+<span class="nc" id="L83">        return crownedPlayerIndex;</span>
+    }
+
+    public void setCrownedPlayerIndex(int index) {
+<span class="nc" id="L87">        this.crownedPlayerIndex = index;</span>
+        // Update crown status among players
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        for (int i = 0; i &lt; players.size(); i++) {</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            players.get(i).setCrown(i == index);</span>
+        }
+<span class="nc" id="L92">    }</span>
+
+    public List&lt;Player&gt; getPlayers() {
+<span class="nc" id="L95">        return players;</span>
+    }
+    
+    public CharacterAbilities getCharacterAbilities() {
+<span class="nc" id="L99">        return characterAbilities;</span>
+    }
+
+    public int getKilledCharacterThisRound() {
+        // This would be set by CharacterSelector or Assassin's ability logic
+<span class="nc" id="L104">        return characterSelector.getKilledCharacterRank(); // Delegate to CharacterSelector</span>
+    }
+
+    public void setKilledCharacterThisRound(int rank) {
+<span class="nc" id="L108">        this.killedCharacterThisRound = rank;</span>
+<span class="nc" id="L109">    }</span>
+
+    public int getRobbedCharacterThisRound() {
+        // This would be set by Thief's ability logic
+<span class="nc" id="L113">        return characterSelector.getRobbedCharacterRank(); // Delegate to CharacterSelector</span>
+    }
+    
+    public void setRobbedCharacterThisRound(int rank) {
+<span class="nc" id="L117">        this.robbedCharacterThisRound = rank;</span>
+<span class="nc" id="L118">    }</span>
+
+
+    public CharacterCard getCharacterByRank(int rank) {
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        for (CharacterCard card : characterDeck) { // Assuming characterDeck holds all base characters</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            if (card.getRank() == rank) {</span>
+<span class="nc" id="L124">                return card;</span>
+            }
+<span class="nc" id="L126">        }</span>
+<span class="nc" id="L127">        return null; // Or throw an exception if a card for a rank is always expected</span>
+    }
+
+    public boolean checkGameOverCondition() {
+        // Game ends if a player has built 7 districts at the end of a round.
+        // The game then completes that round.
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (gameOver) return true; // If already set by Warlord destroying 7th district etc.</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        for (Player player : players) {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if (player.getCity().size() &gt;= 7) { // Typically 7 districts to trigger game end</span>
+                // this.gameOver = true; // The game should finish the current round.
+                // The actual setting of gameOver might happen after all turns in the round are done.
+<span class="nc" id="L138">                System.out.println(&quot;Player &quot; + player.getId() + &quot; has reached 7 districts. Game will end after this round.&quot;);</span>
+<span class="nc" id="L139">                return true; // Condition to end the game (after round) is met</span>
+            }
+<span class="nc" id="L141">        }</span>
+<span class="nc" id="L142">        return false;</span>
+    }
+
+
+    public void setScanner(Scanner scanner) {
+<span class="nc" id="L147">        this.scanner = scanner;</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if(characterAbilities != null) characterAbilities.setScanner(scanner);</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if(purpleDistrict != null) purpleDistrict.setScanner(scanner);</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if(turnManager != null) turnManager.setScanner(scanner);</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if(characterSelector != null) characterSelector.setScanner(scanner);</span>
+<span class="nc" id="L152">    }</span>
+
+    // === PHASE 1: CHARACTER SELECTION ===
+    public void characterSelectionPhase(Scanner scanner) {
+<span class="nc" id="L156">        characterSelector.setScanner(scanner); // Ensure selector has the scanner</span>
+        // characterToPlayer map is updated directly by characterSelector
+<span class="nc" id="L158">        this.characterToPlayer = characterSelector.selectCharacters(crownedPlayerIndex);</span>
+        // Update TurnManager's map reference if it was created with an old/empty one
+<span class="nc" id="L160">        this.turnManager = new TurnManager(this, players, districtDeck, this.characterToPlayer);</span>
+<span class="nc" id="L161">        this.turnManager.setScanner(scanner); // Ensure new TurnManager also has scanner</span>
+         // Update CharacterAbilities' map reference
+<span class="nc" id="L163">        this.characterAbilities = new CharacterAbilities(this, players, districtDeck, characterDeck, this.characterToPlayer);</span>
+<span class="nc" id="L164">        this.characterAbilities.setScanner(scanner);</span>
+
+<span class="nc" id="L166">    }</span>
+
+    // === PHASE 2: TURN PHASE ===
+    public void turnPhase(Scanner scanner) {
+<span class="nc" id="L170">        turnManager.setScanner(scanner); // Ensure turnManager has the scanner</span>
+<span class="nc" id="L171">        turnManager.processTurns(); // This will use the characterToPlayer map</span>
+
+        // After all turns, if game over condition was met, truly set gameOver.
+<span class="nc bnc" id="L174" title="All 4 branches missed.">        if (checkGameOverCondition() &amp;&amp; !gameOver) { // Check again, in case it was triggered during a turn</span>
+<span class="nc" id="L175">            this.gameOver = true; // Now officially set it</span>
+<span class="nc" id="L176">             System.out.println(&quot;The round has ended and the game is now over!&quot;);</span>
+        }
+
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (gameOver) {</span>
+<span class="nc" id="L180">            System.out.println(&quot;Calculating final scores...&quot;);</span>
+<span class="nc" id="L181">            showScores();</span>
+        }
+<span class="nc" id="L183">    }</span>
+
+    private int handleCharacterAbility(Player player, Scanner scanner, int killedCharacter, int robbedCharacter) {
+<span class="nc" id="L186">        characterAbilities.setScanner(scanner);</span>
+<span class="nc" id="L187">        return characterAbilities.handleAbility(player, killedCharacter, robbedCharacter);</span>
+    }
+
+    private void handlePurpleDistrictAbility(Player player, DistrictCard card, Scanner scanner) {
+<span class="nc" id="L191">        purpleDistrict.setScanner(scanner);</span>
+<span class="nc" id="L192">        purpleDistrict.handleAbility(player, card);</span>
+<span class="nc" id="L193">    }</span>
+
+    private String characterName(int num) {
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        for (CharacterCard c : characterDeck) {</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">            if (c.getNumber() == num)</span>
+<span class="nc" id="L198">                return c.getName();</span>
+<span class="nc" id="L199">        }</span>
+<span class="nc" id="L200">        return &quot;Unknown&quot;;</span>
+    }
+
+    private boolean hasDistrict(Player p, String name) {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        for (DistrictCard d : p.getCity()) {</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">            if (d.name.equals(name))</span>
+<span class="nc" id="L206">                return true;</span>
+<span class="nc" id="L207">        }</span>
+<span class="nc" id="L208">        return false;</span>
+    }
+
+    public void showHand(Player player) {
+<span class="nc" id="L212">        System.out.println(player.getName() + &quot;'s hand:&quot;); // Assuming Player has getName()</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        for (int i = 0; i &lt; player.getHand().size(); i++) {</span>
+<span class="nc" id="L214">            DistrictCard card = player.getHand().get(i);</span>
+<span class="nc" id="L215">            System.out.println((i + 1) + &quot;: &quot; + card.name + &quot; (&quot; + card.cost + &quot; gold, &quot; + card.color + &quot;)&quot;);</span>
+        }
+<span class="nc" id="L217">    }</span>
+
+    public void build(Player player, int handIndex) {
+<span class="nc bnc" id="L220" title="All 4 branches missed.">        if (handIndex &lt; 1 || handIndex &gt; player.getHand().size()) {</span>
+<span class="nc" id="L221">            System.out.println(&quot;Invalid card number.&quot;);</span>
+<span class="nc" id="L222">            return;</span>
+        }
+<span class="nc" id="L224">        DistrictCard card = player.getHand().get(handIndex - 1);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (player.getGold() &lt; card.cost) {</span>
+<span class="nc" id="L226">            System.out.println(&quot;Not enough gold to build &quot; + card.name + &quot; (Cost: &quot; + card.cost + &quot;, Your Gold: &quot; + player.getGold() + &quot;).&quot;);</span>
+<span class="nc" id="L227">            return;</span>
+        }
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        for (DistrictCard built : player.getCity()) {</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            if (built.name.equals(card.name)) {</span>
+<span class="nc" id="L231">                System.out.println(&quot;You already have &quot; + card.name + &quot; in your city.&quot;);</span>
+<span class="nc" id="L232">                return;</span>
+            }
+<span class="nc" id="L234">        }</span>
+<span class="nc" id="L235">        player.buildDistrict(card); // This method should remove card from hand and gold from player</span>
+<span class="nc" id="L236">        System.out.println(player.getName() + &quot; built &quot; + card.name + &quot;.&quot;);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (purpleDistrict != null) { // Check if purpleDistrict handler is initialized</span>
+<span class="nc" id="L238">            purpleDistrict.handleAbility(player, card);</span>
+        }
+<span class="nc" id="L240">    }</span>
+
+    public void processTurn() {
+<span class="nc" id="L243">        turnManager.processTurns();</span>
+<span class="nc" id="L244">    }</span>
+
+    public void showCity(Player player) {
+<span class="nc" id="L247">        System.out.println(player.getName() + &quot;'s city:&quot;);</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (player.getCity().isEmpty()) {</span>
+<span class="nc" id="L249">            System.out.println(&quot;  (empty)&quot;);</span>
+        }
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        for (DistrictCard card : player.getCity()) {</span>
+<span class="nc" id="L252">            System.out.println(&quot;  &quot; + card.name + &quot; (&quot; + card.color + &quot;, &quot; + card.cost + &quot; gold)&quot;);</span>
+<span class="nc" id="L253">        }</span>
+<span class="nc" id="L254">        System.out.println(&quot;  Total districts: &quot; + player.getCity().size());</span>
+<span class="nc" id="L255">    }</span>
+
+
+    private void showScores() {
+<span class="nc" id="L259">        scoreManager.showScores();</span>
+<span class="nc" id="L260">    }</span>
+
+    public void saveGame(String filename) {
+<span class="nc" id="L263">        saveLoad.saveGame(filename);</span>
+<span class="nc" id="L264">    }</span>
+
+    public void loadGame(String filename) {
+<span class="nc" id="L267">        saveLoad.loadGame(filename);</span>
+         // After loading, ensure current TurnManager and CharacterAbilities have the correct characterToPlayer map
+<span class="nc" id="L269">        this.turnManager = new TurnManager(this, this.players, this.districtDeck, this.characterToPlayer);</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (this.scanner != null) this.turnManager.setScanner(this.scanner);</span>
+<span class="nc" id="L271">        this.characterAbilities = new CharacterAbilities(this, this.players, this.districtDeck, this.characterDeck, this.characterToPlayer);</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">         if (this.scanner != null) this.characterAbilities.setScanner(this.scanner);</span>
+<span class="nc" id="L273">    }</span>
+    
+    public Map&lt;Integer, Player&gt; getCharacterToPlayerMap() {
+<span class="nc" id="L276">        return characterToPlayer;</span>
+    }
+
+    public void setCharacterToPlayerMap(Map&lt;Integer, Player&gt; map) {
+<span class="nc" id="L280">        this.characterToPlayer = map;</span>
+<span class="nc" id="L281">    }</span>
+
+
+    public void toggleDebug() {
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        debugMode = !debugMode;</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        System.out.println(&quot;Debug mode &quot; + (debugMode ? &quot;enabled&quot; : &quot;disabled&quot;) + &quot;.&quot;);</span>
+<span class="nc" id="L287">    }</span>
+
+    public void showInfo(String arg) {
+        // Try to parse as card number in hand
+        try {
+<span class="nc" id="L292">            int idx = Integer.parseInt(arg);</span>
+<span class="nc" id="L293">            Player human = null; // Find the human player</span>
+<span class="nc bnc" id="L294" title="All 4 branches missed.">            for(Player p : players) { if(p.isHuman()) { human = p; break; } }</span>
+
+<span class="nc bnc" id="L296" title="All 6 branches missed.">            if (human != null &amp;&amp; idx &gt;= 1 &amp;&amp; idx &lt;= human.getHand().size()) {</span>
+<span class="nc" id="L297">                DistrictCard card = human.getHand().get(idx - 1);</span>
+<span class="nc" id="L298">                System.out.println(card.name + &quot;: &quot; + card.text);</span>
+<span class="nc" id="L299">                return;</span>
+            }
+<span class="nc" id="L301">        } catch (NumberFormatException e) {</span>
+            // Not a number, treat as character name
+<span class="nc bnc" id="L303" title="All 2 branches missed.">            for (CharacterCard cc : characterDeck) {</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">                if (cc.getName().equalsIgnoreCase(arg)) {</span>
+<span class="nc" id="L305">                    System.out.println(cc);</span>
+<span class="nc" id="L306">                    return;</span>
+                }
+<span class="nc" id="L308">            }</span>
+<span class="nc" id="L309">        }</span>
+<span class="nc" id="L310">        System.out.println(&quot;No such card or character, or no human player found for hand check.&quot;);</span>
+<span class="nc" id="L311">    }</span>
+
+    public void describeAction(Player player) {
+<span class="nc" id="L314">        CharacterCard character = player.getCharacter();</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (character == null) {</span>
+<span class="nc" id="L316">            System.out.println(&quot;You have no character this round.&quot;);</span>
+<span class="nc" id="L317">            return;</span>
+        }
+<span class="nc" id="L319">        System.out.println(&quot;Your character: &quot; + character.getName());</span>
+<span class="nc" id="L320">        System.out.println(&quot;Ability: &quot; + character.getAbility());</span>
+<span class="nc" id="L321">        System.out.println(&quot;To use your ability, type 'action' during your turn.&quot;);</span>
+<span class="nc" id="L322">    }</span>
+
+    public void initTestGame() {
+        // Clear existing state
+<span class="nc" id="L326">        this.players.clear();</span>
+<span class="nc" id="L327">        this.characterToPlayer.clear();</span>
+
+
+        // Create test players
+<span class="nc" id="L331">        Player p1 = new Player(1, true); // Human player</span>
+<span class="nc" id="L332">        p1.setName(&quot;Player 1 (Human)&quot;);</span>
+<span class="nc" id="L333">        p1.addGold(5);</span>
+
+<span class="nc" id="L335">        Player p2 = new Player(2, false); // AI player</span>
+<span class="nc" id="L336">        p2.setName(&quot;Player 2 (AI)&quot;);</span>
+<span class="nc" id="L337">        p2.addGold(3);</span>
+        
+<span class="nc" id="L339">        this.players.add(p1);</span>
+<span class="nc" id="L340">        this.players.add(p2);</span>
+
+
+        // Reset deck
+<span class="nc" id="L344">        List&lt;DistrictCard&gt; cards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L345">        cards.add(new DistrictCard(&quot;Temple&quot;, &quot;blue&quot;, 1, &quot;Temple Text&quot;));</span>
+<span class="nc" id="L346">        cards.add(new DistrictCard(&quot;Watchtower&quot;, &quot;red&quot;, 1, &quot;Watchtower Text&quot;));</span>
+<span class="nc" id="L347">        cards.add(new DistrictCard(&quot;Castle&quot;, &quot;yellow&quot;, 4, &quot;Castle Text&quot;));</span>
+<span class="nc" id="L348">        cards.add(new DistrictCard(&quot;Tavern&quot;, &quot;green&quot;, 1, &quot;Tavern Text&quot;));</span>
+<span class="nc" id="L349">        cards.add(new DistrictCard(&quot;Market&quot;, &quot;green&quot;, 2, &quot;Market Text&quot;));</span>
+<span class="nc" id="L350">        cards.add(new DistrictCard(&quot;Palace&quot;, &quot;yellow&quot;, 5, &quot;Palace Text&quot;));</span>
+<span class="nc" id="L351">        this.districtDeck = new Deck(cards);</span>
+        
+<span class="nc" id="L353">        p1.addToHand(districtDeck.draw()); // Castle</span>
+<span class="nc" id="L354">        p1.addToHand(districtDeck.draw()); // Tavern</span>
+        // p1.buildDistrict(new DistrictCard(&quot;Manor&quot;, &quot;purple&quot;, 3, &quot;&quot;));
+
+
+        // Reset character deck (or ensure it's properly initialized)
+<span class="nc" id="L359">        this.characterDeck.clear();</span>
+<span class="nc" id="L360">        this.characterDeck.add(new CharacterCard(1, &quot;Assassin&quot;, &quot;Kill a character&quot;));</span>
+<span class="nc" id="L361">        this.characterDeck.add(new CharacterCard(2, &quot;Thief&quot;, &quot;Steal gold from another character&quot;));</span>
+<span class="nc" id="L362">        this.characterDeck.add(new CharacterCard(3, &quot;Magician&quot;, &quot;Swap hand or discard&quot;));</span>
+<span class="nc" id="L363">        this.characterDeck.add(new CharacterCard(4, &quot;King&quot;, &quot;Take crown, get gold for yellow&quot;));</span>
+
+
+<span class="nc" id="L366">        this.round = 1;</span>
+<span class="nc" id="L367">        this.crownedPlayerIndex = 0;</span>
+<span class="nc" id="L368">        players.get(0).setCrown(true);</span>
+<span class="nc" id="L369">        this.gameOver = false;</span>
+<span class="nc" id="L370">    }</span>
+
+    public void showAll() {
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        for (Player player : players) {</span>
+<span class="nc" id="L374">            showCity(player);</span>
+<span class="nc" id="L375">        }</span>
+<span class="nc" id="L376">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
